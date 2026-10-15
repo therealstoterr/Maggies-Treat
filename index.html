@@ -1,0 +1,137 @@
+<!doctype html>
+<html lang="en-ZA">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#ff7900">
+  <meta name="description" content="Order wraps, shawarma, ice cream and frozen treats from Maggie's Treat in Soshanguve. Pickup only.">
+  <title>Maggie's Treat | Fresh, tasty & local</title>
+  <link rel="icon" href="assets/maggies-treat-logo.jpg" type="image/jpeg">
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+  <div class="top-strip">FRESH • TASTY • LOCAL <span>Pickup only — no delivery</span></div>
+  <header class="site-header">
+    <a class="brand" href="#home" aria-label="Maggie's Treat home">
+      <img src="assets/maggies-treat-logo.jpg" alt="Maggie's Treat logo">
+      <span><strong>MAGGIE'S TREAT</strong><small>Township food business</small></span>
+    </a>
+    <nav class="main-nav" aria-label="Main navigation">
+      <a href="#menu">Menu</a>
+      <a href="#order">Order</a>
+      <a href="#reviews">Reviews</a>
+      <a class="nav-admin" href="admin.html">Admin login</a>
+    </nav>
+    <a class="button button-small" href="#order">Order now <span aria-hidden="true">↗</span></a>
+  </header>
+
+  <main>
+    <section class="hero section-wrap" id="home">
+      <div class="hero-copy">
+        <span class="eyebrow"><span class="eyebrow-dot"></span> YOUR LOCAL FOOD STOP</span>
+        <h1>Good food.<br><em>Good mood.</em></h1>
+        <p class="hero-lead">From delicious wraps and loaded shawarma to cool ice cream treats — there’s something tasty waiting for you.</p>
+        <div class="hero-actions">
+          <a class="button" href="#menu">Explore the menu <span aria-hidden="true">↓</span></a>
+          <a class="button button-outline" href="https://wa.me/27818962131?text=Hi%20Maggie%27s%20Treat%2C%20I%20would%20like%20to%20place%20an%20order." target="_blank" rel="noopener">WhatsApp us</a>
+        </div>
+        <div class="hero-highlights">
+          <div><strong>19</strong><span>tasty choices</span></div>
+          <div><strong>From R2</strong><span>frozen treats</span></div>
+          <div><strong>Local</strong><span>Soshanguve</span></div>
+        </div>
+      </div>
+      <div class="hero-visual">
+        <div class="hero-orange-shape"></div>
+        <img src="assets/maggies-treat-logo.jpg" alt="Maggie's Treat illustrated food logo" class="hero-logo">
+        <div class="hero-sticker"><span>MADE WITH</span><strong>LOVE ♥</strong><span>AND FLAVOUR</span></div>
+        <div class="hero-caption"><span class="caption-mark">✦</span><span>Wraps <b>•</b> Shawarma <b>•</b> Ice cream</span></div>
+      </div>
+    </section>
+
+    <section class="trust-row" aria-label="Business highlights">
+      <div><span class="trust-icon">✦</span><span><strong>Affordable prices</strong><small>Everyday tasty value</small></span></div>
+      <div><span class="trust-icon">⌂</span><span><strong>Pickup only</strong><small>Collect your order</small></span></div>
+      <div><span class="trust-icon">♡</span><span><strong>Made for the local community</strong><small>Thank you for supporting us</small></span></div>
+    </section>
+
+    <section class="menu-section section-wrap" id="menu">
+      <div class="section-heading">
+        <div><span class="eyebrow">THE GOOD STUFF</span><h2>Our <em>menu</em></h2></div>
+        <p>Choose your favourites, add them to your basket, then send your order. Prices are in South African rand.</p>
+      </div>
+      <div class="menu-toolbar">
+        <div id="menuFilters" class="filter-pills" aria-label="Filter menu by category"></div>
+        <span id="menuConnection" class="connection-note">Prices shown below</span>
+      </div>
+      <div id="menuGrid" class="menu-grid" aria-live="polite">
+        <div class="loading-card">Getting the menu ready…</div>
+      </div>
+    </section>
+
+    <section class="order-section" id="order">
+      <div class="section-wrap order-layout">
+        <div class="order-intro">
+          <span class="eyebrow eyebrow-light">LET'S GET YOUR ORDER READY</span>
+          <h2>Your cravings.<br><em>Your order.</em></h2>
+          <p>Add the food you want from the menu, then enter your name and contact number. We’ll use your details to confirm collection.</p>
+          <div class="pickup-card"><span class="pickup-icon">⌂</span><div><strong>Pickup only</strong><p>9440 Ext 2, Adonis Street, Soshanguve</p></div></div>
+          <a class="phone-link" href="tel:0818962131">Call us: <strong>081 896 2131</strong></a>
+        </div>
+        <div class="checkout-card">
+          <div class="checkout-heading"><div><span class="eyebrow">STEP 1</span><h3>Your basket</h3></div><span class="basket-count" id="basketCount">0 items</span></div>
+          <div id="cartItems" class="cart-items"><div class="empty-cart">Your basket is empty. Add a favourite from the menu first.</div></div>
+          <div class="cart-total"><span>Estimated total</span><strong id="cartTotal">R0</strong></div>
+          <p class="fine-print">Your final total is confirmed when we receive your order.</p>
+          <div class="form-divider"></div>
+          <div class="checkout-heading"><div><span class="eyebrow">STEP 2</span><h3>Your details</h3></div></div>
+          <form id="orderForm" class="form-stack">
+            <label for="customerName">Your name <span>*</span></label>
+            <input id="customerName" name="customerName" type="text" autocomplete="name" maxlength="80" placeholder="e.g. Thando Mokoena" required>
+            <label for="customerPhone">Phone number <span>*</span></label>
+            <input id="customerPhone" name="customerPhone" type="tel" autocomplete="tel" inputmode="tel" maxlength="25" placeholder="e.g. 081 234 5678" required>
+            <label for="orderNote">Anything we should know? <small>(optional)</small></label>
+            <textarea id="orderNote" name="orderNote" rows="3" maxlength="500" placeholder="Extra sauce, collection details, or special requests…"></textarea>
+            <button class="button button-full" type="submit" id="submitOrderBtn">Place my order <span aria-hidden="true">→</span></button>
+            <p class="form-message" id="orderMessage" role="status" aria-live="polite"></p>
+            <p class="privacy-note">Your phone number and order details are used to manage your order. Please double-check your contact number.</p>
+          </form>
+        </div>
+      </div>
+    </section>
+
+    <section class="reviews-section section-wrap" id="reviews">
+      <div class="review-copy"><span class="eyebrow">HELP US GROW</span><h2>Had a <em>treat?</em></h2><p>Tell us how we did. Your feedback helps Maggie’s Treat keep serving the community better.</p><div class="review-promise"><span>★★★★★</span><p>Every review means a lot to our local business.</p></div></div>
+      <div class="review-form-card">
+        <h3>Leave a review</h3>
+        <form id="reviewForm" class="form-stack">
+          <label for="reviewName">Your name <span>*</span></label>
+          <input id="reviewName" name="reviewName" type="text" maxlength="80" placeholder="Your name" required>
+          <label>How was your experience? <span>*</span></label>
+          <div class="rating-picker" role="radiogroup" aria-label="Choose a rating">
+            <label><input type="radio" name="rating" value="1" required><span aria-label="1 star">★</span></label>
+            <label><input type="radio" name="rating" value="2"><span aria-label="2 stars">★</span></label>
+            <label><input type="radio" name="rating" value="3"><span aria-label="3 stars">★</span></label>
+            <label><input type="radio" name="rating" value="4"><span aria-label="4 stars">★</span></label>
+            <label><input type="radio" name="rating" value="5"><span aria-label="5 stars">★</span></label>
+          </div>
+          <label for="reviewComment">Your feedback <small>(optional)</small></label>
+          <textarea id="reviewComment" name="reviewComment" rows="3" maxlength="700" placeholder="What did you enjoy? What can we improve?"></textarea>
+          <button class="button button-dark button-full" type="submit" id="submitReviewBtn">Send review <span aria-hidden="true">→</span></button>
+          <p class="form-message" id="reviewMessage" role="status" aria-live="polite"></p>
+        </form>
+      </div>
+    </section>
+
+    <section class="contact-band">
+      <div class="section-wrap contact-band-inner"><div><span class="eyebrow eyebrow-light">COME THROUGH</span><h2>Local flavour. <em>Lots of love.</em></h2><p>Find us at 9440 Ext 2, Adonis Street, Soshanguve.</p></div><div class="contact-actions"><a class="button button-white" href="tel:0818962131">Call 081 896 2131</a><a class="button button-outline-light" href="https://wa.me/27818962131" target="_blank" rel="noopener">WhatsApp</a></div></div>
+    </section>
+  </main>
+
+  <footer class="site-footer"><a class="footer-brand" href="#home">MAGGIE'S <span>TREAT</span></a><p>Fresh • Tasty • Local</p><div class="footer-links"><a href="#menu">Menu</a><a href="#order">Order</a><a href="#reviews">Reviews</a><a href="admin.html">Admin login</a></div><small>© <span id="currentYear"></span> Maggie’s Treat. All rights reserved.</small></footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/config.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
