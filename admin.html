@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="en-ZA">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#ff7900">
+  <meta name="robots" content="noindex,nofollow">
+  <title>Admin Dashboard | Maggie's Treat</title>
+  <link rel="icon" href="assets/maggies-treat-logo.jpg" type="image/jpeg">
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body class="admin-body">
+  <header class="admin-header"><a class="brand" href="index.html"><img src="assets/maggies-treat-logo.jpg" alt="Maggie's Treat logo"><span><strong>MAGGIE'S TREAT</strong><small>Owner dashboard</small></span></a><div class="admin-header-actions"><a href="index.html" class="text-link">View customer website ↗</a><button id="logoutBtn" class="button button-dark button-small hidden" type="button">Log out</button></div></header>
+  <main class="admin-main section-wrap">
+    <section id="setupNotice" class="setup-notice hidden"><h2>Finish connecting your website</h2><p>The site needs your Supabase project URL and public anon/publishable key in <code>js/config.js</code>, plus the SQL setup script. Follow the README included with the website files.</p></section>
+    <section id="loginPanel" class="login-panel">
+      <span class="eyebrow">PRIVATE AREA</span><h1>Welcome <em>back.</em></h1><p>Sign in with your store admin email and password to manage orders and view sales.</p>
+      <form id="loginForm" class="form-stack"><label for="loginEmail">Admin email</label><input id="loginEmail" name="email" type="email" autocomplete="username" required placeholder="you@example.com"><label for="loginPassword">Password</label><input id="loginPassword" name="password" type="password" autocomplete="current-password" required placeholder="Your password"><button class="button button-full" type="submit">Sign in to dashboard →</button><p id="loginMessage" class="form-message" role="status" aria-live="polite"></p></form>
+      <p class="privacy-note">This page is protected by Supabase login and database permissions. Do not share your admin password.</p>
+    </section>
+    <section id="dashboardPanel" class="dashboard-panel hidden">
+      <div class="dashboard-title-row"><div><span class="eyebrow">YOUR BUSINESS AT A GLANCE</span><h1>Store <em>dashboard</em></h1><p id="lastUpdated" class="muted-text">Loading your business figures…</p></div><button class="button button-outline" id="refreshBtn" type="button">↻ Refresh</button></div>
+      <div id="dashboardMessage" class="form-message" role="status" aria-live="polite"></div>
+      <div class="stats-grid">
+        <article class="stat-card stat-featured"><span>Revenue today</span><strong id="revenueToday">R0</strong><small>Completed orders</small></article>
+        <article class="stat-card"><span>Revenue this week</span><strong id="revenueWeek">R0</strong><small>Monday to today</small></article>
+        <article class="stat-card"><span>Revenue this month</span><strong id="revenueMonth">R0</strong><small>Month to date</small></article>
+        <article class="stat-card"><span>Orders today</span><strong id="ordersToday">0</strong><small>All statuses</small></article>
+        <article class="stat-card"><span>Average rating</span><strong id="averageRating">—</strong><small id="reviewCount">0 reviews</small></article>
+      </div>
+      <section class="dashboard-section"><div class="dashboard-section-heading"><div><span class="eyebrow">KEEP THINGS MOVING</span><h2>Customer <em>orders</em></h2></div><label class="filter-label" for="orderStatusFilter">Show <select id="orderStatusFilter"><option value="all">All orders</option><option value="new">New</option><option value="preparing">Preparing</option><option value="ready">Ready for collection</option><option value="completed">Completed / paid</option><option value="cancelled">Cancelled</option></select></label></div><div id="ordersList" class="orders-list"><div class="loading-card">Loading orders…</div></div></section>
+      <section class="dashboard-section"><div class="dashboard-section-heading"><div><span class="eyebrow">WHAT CUSTOMERS SAY</span><h2>Customer <em>reviews</em></h2></div></div><div id="reviewsList" class="reviews-list"><div class="loading-card">Loading reviews…</div></div></section>
+      <p class="dashboard-footnote">Revenue is calculated from orders marked <strong>Completed / paid</strong>. Mark an order completed only after you have received payment. Reports use South African time.</p>
+    </section>
+  </main>
+  <footer class="site-footer admin-footer"><a class="footer-brand" href="index.html">MAGGIE'S <span>TREAT</span></a><small>Store management · Keep your login private</small></footer>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/config.js"></script>
+  <script src="js/admin.js"></script>
+</body>
+</html>
