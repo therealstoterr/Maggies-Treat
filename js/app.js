@@ -5,11 +5,11 @@
   const configured = Boolean(
     config.supabaseUrl && config.supabasePublishableKey &&
     config.supabaseUrl.startsWith('https://') &&
-    !config.supabaseUrl.includes('PASTE_') &&
-    !config.supabasePublishableKey.includes('PASTE_') &&
+   !config.supabaseUrl.includes('PASTE_') &&
+   !config.supabasePublishableKey.includes('PASTE_') &&
     window.supabase && typeof window.supabase.createClient === 'function'
   );
-  const db = configured ? window.supabase.createClient(config.supabaseUrl, config.supabasePublishableKey) : null;
+  const db = configured? window.supabase.createClient(config.supabaseUrl, config.supabasePublishableKey) : null;
   const businessPhone = '27818962131';
 
   const fallbackMenu = [
@@ -40,7 +40,7 @@
 
   const $ = (id) => document.getElementById(id);
   const money = (amount) => new Intl.NumberFormat('en-ZA', {style:'currency',currency:'ZAR',maximumFractionDigits:0}).format(Number(amount || 0));
-  const escapeHtml = (value) => String(value ?? '').replace(/[&<>"']/g, (character) => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[character]));
+  const escapeHtml = (value) => String(value?? '').replace(/[&<>"']/g, (character) => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[character]));
   const menuById = () => new Map(menu.map((item) => [item.id, item]));
   const cartQuantity = () => Object.values(cart).reduce((sum, quantity) => sum + quantity, 0);
   const cartTotal = () => Object.entries(cart).reduce((sum, [id, quantity]) => sum + (Number(menuById().get(id)?.price) || 0) * quantity, 0);
@@ -59,14 +59,14 @@
   function renderFilters() {
     const container = $('menuFilters');
     if (!container) return;
-    const categories = ['All', ...new Set(menu.map((item) => item.category))];
-    container.innerHTML = categories.map((category) => `<button type="button" class="filter-pill${category === activeCategory ? ' active' : ''}" data-filter="${escapeHtml(category)}">${escapeHtml(category)}</button>`).join('');
+    const categories = ['All',...new Set(menu.map((item) => item.category))];
+    container.innerHTML = categories.map((category) => `<button type="button" class="filter-pill${category === activeCategory? ' active' : ''}" data-filter="${escapeHtml(category)}">${escapeHtml(category)}</button>`).join('');
   }
 
   function renderMenu() {
     const container = $('menuGrid');
     if (!container) return;
-    const visibleItems = activeCategory === 'All' ? menu : menu.filter((item) => item.category === activeCategory);
+    const visibleItems = activeCategory === 'All'? menu : menu.filter((item) => item.category === activeCategory);
     if (!visibleItems.length) {
       container.innerHTML = '<div class="empty-state">No items in this category just yet.</div>';
       return;
@@ -77,7 +77,7 @@
         <span class="food-category">${escapeHtml(item.category)}</span>
         <h3>${escapeHtml(item.name)}</h3>
         <p>${escapeHtml(item.description || 'A tasty Maggie’s Treat favourite.')}</p>
-        <div class="menu-card-bottom"><span class="cart-row-price">${cart[item.id] ? `${cart[item.id]} in your basket` : 'Made for your cravings'}</span><button type="button" class="add-button" data-add="${escapeHtml(item.id)}">${cart[item.id] ? '＋ Add another' : '＋ Add to order'}</button></div>
+        <div class="menu-card-bottom"><span class="cart-row-price">${cart[item.id]? `${cart[item.id]} in your basket` : 'Made for your cravings'}</span><button type="button" class="add-button" data-add="${escapeHtml(item.id)}">${cart[item.id]? '＋ Add another' : '＋ Add to order'}</button></div>
       </article>`).join('');
   }
 
@@ -93,8 +93,10 @@
         return `<div class="cart-row"><div><div class="cart-row-name">${escapeHtml(item.name)}</div><div class="cart-row-price">${money(item.price)} × ${quantity} = ${money(Number(item.price) * quantity)}</div></div><div class="cart-controls"><button type="button" data-cart-change="-1" data-id="${escapeHtml(id)}" aria-label="Remove one ${escapeHtml(item.name)}">−</button><span class="cart-qty">${quantity}</span><button type="button" data-cart-change="1" data-id="${escapeHtml(id)}" aria-label="Add one ${escapeHtml(item.name)}">+</button></div></div>`;
       }).join('');
     }
-    $('basketCount').textContent = `${cartQuantity()} ${cartQuantity() === 1 ? 'item' : 'items'}`;
-    $('cartTotal').textContent = money(cartTotal());
+    const basketCountEl = $('basketCount');
+    const cartTotalEl = $('cartTotal');
+    if(basketCountEl) basketCountEl.textContent = `${cartQuantity()} ${cartQuantity() === 1? 'item' : 'items'}`;
+    if(cartTotalEl) cartTotalEl.textContent = money(cartTotal());
     renderMenu();
   }
 
@@ -138,7 +140,7 @@
       const item = menuById().get(id);
       return `${qty} x ${item.name} — ${money(item.price * qty)}`;
     });
-    return `Hi Maggie's Treat! I'd like to place a pickup order.\n\nName: ${name}\nPhone: ${phone}\n\nOrder:\n${lines.join('\n')}\n\nEstimated total: ${money(cartTotal())}${note ? `\nNote: ${note}` : ''}\n\nPickup: 9440 Ext 2, Adonis Street, Soshanguve.`;
+    return `Hi Maggie's Treat! I'd like to place a pickup order.\n\nName: ${name}\nPhone: ${phone}\n\nOrder:\n${lines.join('\n')}\n\nEstimated total: ${money(cartTotal())}${note? `\nNote: ${note}` : ''}\n\nPickup: 9440 Ext 2, Adonis Street, Soshanguve.`;
   }
 
   async function submitOrder(event) {
@@ -162,40 +164,43 @@
       $('customerPhone').focus();
       return;
     }
+
+    const waText = orderMessage(name, phone, note);
+    const whatsappUrl = `https://wa.me/${businessPhone}?text=${encodeURIComponent(waText)}`;
+
     if (!db) {
-      const text = orderMessage(name, phone, note);
-      const whatsappUrl = `https://wa.me/${businessPhone}?text=${encodeURIComponent(text)}`;
-      setMessage(message, 'Online order storage is not connected yet. Opening WhatsApp so you can send the order directly.', false);
+      setMessage(message, 'Opening WhatsApp so you can send the order directly.', false);
       window.open(whatsappUrl, '_blank', 'noopener,noreferrer');
       return;
     }
+
     button.disabled = true;
     button.textContent = 'Sending your order…';
     setMessage(message, 'Sending your order securely…');
+
     try {
       const payload = {
         customer_name: name,
-        phone: phone,
-        note: note || null,
-        items: Object.entries(cart).map(([id, quantity]) => ({id, quantity}))
+        customer_phone: phone,
+        items: Object.entries(cart).map(([id, quantity]) => {
+          const it = menuById().get(id);
+          return { id, name: it.name, quantity, price: it.price, line_total: it.price * quantity };
+        }),
+        total: cartTotal(),
+        order_note: note || null,
+        status: 'new'
       };
       const {error} = await db.from('orders').insert(payload);
       if (error) throw error;
-      setMessage(message, 'Order received! Thank you. Maggie’s Treat will contact you to confirm the order and pickup details.');
+      setMessage(message, 'Order received! Thank you. Opening WhatsApp to confirm pickup.');
+      window.open(whatsappUrl, '_blank', 'noopener,noreferrer');
       cart = {};
       $('orderForm').reset();
       renderCart();
     } catch (error) {
-      console.error('Order submission failed:', error);
-      setMessage(message, 'We could not save your order online. Please send it via WhatsApp instead.', true);
-      const fallback = document.createElement('a');
-      fallback.className = 'button button-dark button-full';
-      fallback.href = `https://wa.me/${businessPhone}?text=${encodeURIComponent(orderMessage(name, phone, note))}`;
-      fallback.target = '_blank';
-      fallback.rel = 'noopener noreferrer';
-      fallback.textContent = 'Send this order on WhatsApp';
-      fallback.style.marginTop = '10px';
-      message.insertAdjacentElement('afterend', fallback);
+      console.error('Order submission failed, still opening WhatsApp:', error);
+      setMessage(message, 'We could not save online but your WhatsApp order is ready. Please send it.', false);
+      window.open(whatsappUrl, '_blank', 'noopener,noreferrer');
     } finally {
       button.disabled = false;
       button.innerHTML = 'Place my order <span aria-hidden="true">→</span>';
@@ -258,7 +263,8 @@
 
   $('orderForm')?.addEventListener('submit', submitOrder);
   $('reviewForm')?.addEventListener('submit', submitReview);
-  $('currentYear').textContent = new Date().getFullYear();
+  const yearEl = $('currentYear');
+  if(yearEl) yearEl.textContent = new Date().getFullYear();
   renderFilters();
   renderMenu();
   renderCart();
