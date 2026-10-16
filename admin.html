@@ -50,10 +50,10 @@ main{max-width:1250px;margin:0 auto;padding:24px 20px}
 <header><div style="font-weight:800;display:flex;gap:10px;align-items:center"><span style="width:36px;height:36px;background:#ff7900;border-radius:10px;display:grid;place-items:center;color:#fff">🧁</span> MAGGIE'S TREAT</div><button id="out" class="btn-ghost">Log out</button></header>
 <main>
 <h1 style="font-size:30px;letter-spacing:-1.2px;margin:8px 0 4px">Dashboard</h1>
-<p style="color:#8a7f72;margin:0 0 18px">Local orders - No Supabase</p>
+<p style="color:#8a7f72;margin:0 0 18px">Local orders • WhatsApp + Online • Recent first</p>
 <div id="kpis" class="kpis"></div>
 <div class="orders-wrap">
-<div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px"><h2 style="margin:0;letter-spacing:-1px">Orders</h2><div style="display:flex;gap:8px"><select id="filter" class="btn-ghost"><option value="all">All</option><option value="new">New</option><option value="completed">Completed</option></select><button id="export" class="btn-ghost">Export</button></div></div>
+<div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px"><h2 style="margin:0;letter-spacing:-1px">Orders</h2><div style="display:flex;gap:8px;flex-wrap:wrap"><select id="filter" class="btn-ghost"><option value="all">All</option><option value="new">New</option><option value="completed">Completed</option></select><button id="export" class="btn-ghost">Export CSV</button><button id="clearAll" class="btn-ghost" style="color:#a00;border-color:#ffcccc">Clear Test</button></div></div>
 <div class="tabs"><button class="tab active" data-f="all">All</button><button class="tab" data-f="new">New</button><button class="tab" data-f="completed">Completed</button></div>
 <div id="list" class="grid"></div>
 </div>
@@ -65,7 +65,7 @@ const STORAGE_KEY='maggie_orders_v2';
 let orders=JSON.parse(localStorage.getItem(STORAGE_KEY)||'[]');
 const $=id=>document.getElementById(id);
 
-// SECURE LOGIN - NOT VISIBLE IN HTML
+// YOUR LOGIN - KEEPING SAME
 const ADMIN_USER='plethabo434@gmail.com';
 const ADMIN_PASS='@Maggie2017';
 
@@ -101,21 +101,32 @@ function render(){
   $('list').innerHTML=list.slice().reverse().map(o=>{
     const items=(o.item_details||[]).map(i=>`${i.quantity}× ${i.name}`).join(' • ')||o.items;
     const shortId='#'+String(o.id).slice(-5);
-    return `<div class=ocard><div style="display:flex;justify-content:space-between"><span class="badge b-${o.status}">${o.status}</span><small style="color:#8a7f72">${shortId}</small></div><div style="font-weight:800;font-size:18px;margin:10px 0 2px">${o.customer_name}</div><div style="font-size:13px;color:#8a7f72">📞 ${o.phone} • ${new Date(o.created_at).toLocaleTimeString()}</div><div style="font-size:13px;margin:10px 0">Items: ${items}</div><div style="font-weight:800;font-size:18px">R ${Number(o.total).toFixed(2)}</div>${o.status==='completed'?`<div style="background:#111;color:#fff;padding:10px;border-radius:999px;text-align:center;font-weight:800;margin-top:10px">✓ DONE</div>`:`<button class=btn-done onclick="doneOrder('${o.id}')">DONE → WhatsApp</button>`}</div>`;
+    return `<div class=ocard><div style="display:flex;justify-content:space-between"><span class="badge b-${o.status}">${o.status}</span><small style="color:#8a7f72">${shortId} • ${new Date(o.created_at).toLocaleString()}</small></div><div style="font-weight:800;font-size:18px;margin:10px 0 2px">${o.customer_name}</div><div style="font-size:13px;color:#8a7f72">📞 ${o.phone}</div><div style="font-size:13px;margin:10px 0">Items: ${items}</div>${o.order_note?`<div style="font-size:12px;background:#fdf6ee;padding:8px;border-radius:8px;margin:8px 0">Note: ${o.order_note}</div>`:''}<div style="font-weight:800;font-size:18px">R ${Number(o.total).toFixed(2)}</div>${o.status==='completed'?`<div style="background:#111;color:#fff;padding:10px;border-radius:999px;text-align:center;font-weight:800;margin-top:10px">✓ DONE</div>`:`<button class=btn-done onclick="doneOrder('${o.id}')">DONE → WhatsApp Customer</button>`}</div>`;
   }).join('');
 }
 window.doneOrder=(id)=>{
-  const o=orders.find(x=>x.id==id); o.status='completed'; save();
+  const o=orders.find(x=>x.id==id); if(!o) return; o.status='completed'; save();
   let phone=(o.phone||'').replace(/\D/g,''); if(phone.startsWith('0')) phone='27'+phone.substring(1);
   const items=(o.item_details||[]).map(i=>`• ${i.quantity}x ${i.name}`).join('\n')||o.items;
-  const msg=`Hi ${o.customer_name}! 👋\nYour order from *Maggie's Treat* is DONE! 🎉\n\n${items}\n\nTotal: R${Number(o.total).toFixed(2)}\nReady for collection!`;
+  const msg=`Hi ${o.customer_name}! 👋\nYour order from *Maggie's Treat* is DONE! 🎉\n\n${items}\n\nTotal: R${Number(o.total).toFixed(2)}\nReady for collection at 9440 Ext 2, Adonis Street, Soshanguve!`;
   window.open(`https://wa.me/${phone}?text=${encodeURIComponent(msg)}`,'_blank'); load();
 };
 $('filter').onchange=render;
 document.querySelectorAll('.tab').forEach(t=>t.onclick=()=>{document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active')); t.classList.add('active'); $('filter').value=t.dataset.f; render();});
 $('export').onclick=()=>{
-  const csv=['Date,Customer,Phone,Total,Status',...orders.map(o=>`"${new Date(o.created_at).toLocaleString()}", "${o.customer_name}", "${o.phone}", ${o.total}, ${o.status}`)].join('\n');
+  const csv=['Date,Customer,Phone,Total,Status,Items',...orders.map(o=>`"${new Date(o.created_at).toLocaleString()}", "${o.customer_name}", "${o.phone}", ${o.total}, ${o.status}, "${(o.items||'').replace(/"/g,'""')}"`)].join('\n');
   const a=document.createElement('a'); a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv'})); a.download='maggies-orders.csv'; a.click();
+};
+$('clearAll').onclick=()=>{
+  if(confirm('⚠️ Delete ALL orders? This will clear test orders. Cannot undo!')){
+    if(confirm('Are you SURE? All orders will be gone.')){
+      localStorage.removeItem(STORAGE_KEY);
+      orders=[];
+      save();
+      load();
+      alert('✅ All orders cleared!');
+    }
+  }
 };
 $('out').onclick=()=>{localStorage.removeItem('maggie_admin_logged'); location.reload();};
 if(localStorage.getItem('maggie_admin_logged')) openDash();
