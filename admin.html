@@ -1,72 +1,23 @@
 <!doctype html>
-<html lang="en-ZA">
-<head>
-<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Admin | Maggie's Treat</title>
-<link rel="stylesheet" href="styles.css">
-<script src="config.js"></script>
-<script>
-// FALLBACK: if config.js fails, use real key directly
-if(!window.MT_CONFIG || !window.MT_CONFIG.supabasePublishableKey || window.MT_CONFIG.supabasePublishableKey.includes('PASTE')){
-  window.MT_CONFIG = {
-    supabaseUrl: "https://texzgslhswsyooixscmz.supabase.co",
-    supabasePublishableKey: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRleHpnc2xoc3dzeW9vaXhzY216Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTIxMDE2NDEsImV4cCI6MjEwNzY3NzY0MX0.Ui612PvVsw3jpT_WnR3U4ve8zNpYfcdHSd7KfuKv9U8",
-    adminEmail: "plethabo434@gmail.com"
-  };
-}
-</script>
-<style>
-.hidden{display:none!important}
-.admin-body{background:#f7f1e8;min-height:100vh;display:block!important}
-.login-panel{max-width:480px;margin:40px auto;background:#fff;padding:32px;border-radius:24px;box-shadow:0 8px 30px rgba(0,0,0,.08)}
-.login-panel input{width:100%;padding:14px;border-radius:12px;border:1px solid #ddd;margin:8px 0 16px}
-.button{width:100%;padding:14px;border-radius:999px;background:#ff7900;color:#fff;border:0;font-weight:700;cursor:pointer}
-.error{color:#b00;background:#ffe6e6;padding:12px;border-radius:8px;margin:10px 0}
-.order-card,.admin-review-card{background:#fff;padding:16px;margin:10px 0;border-radius:16px}
-.order-card-head{display:flex;justify-content:space-between}
-.order-items{list-style:none;padding:0}
-.order-items li{display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px dashed #eee}
-.order-status{padding:4px 10px;border-radius:999px;background:#eee;font-size:12px}
-.status-preparing{background:#ffe6cc}.status-ready{background:#d4edda}.status-completed{background:#cce5ff}.status-cancelled{background:#f8d7da}
-</style>
-</head>
-<body class="admin-body">
-<header class="admin-header" style="padding:16px;display:flex;justify-content:space-between;align-items:center;background:#fff">
-<a class="brand" href="index.html"><strong>MAGGIE'S TREAT</strong></a>
-<div><a href="index.html" style="margin-right:12px">View shop</a><button id="logoutBtn" class="hidden" style="padding:8px 16px;border-radius:999px;border:1px solid #ddd;background:#fff;cursor:pointer">Log out</button></div>
-</header>
-<main style="padding:20px;max-width:1200px;margin:0 auto">
-<div id="loginPanel" class="login-panel">
-<span class="eyebrow">PRIVATE AREA</span><h1>Welcome back.</h1>
-<div id="loginMessage"></div>
-<form id="loginForm" autocomplete="off">
-<label>Admin email</label>
-<input id="loginEmail" type="email" placeholder="Admin email" autocomplete="username" required>
-<label>Password</label>
-<input id="loginPassword" type="password" placeholder="Your password" autocomplete="current-password" required>
-<button class="button" type="submit">Sign in to dashboard →</button>
-</form>
-</div>
-<div id="dashboardPanel" class="hidden">
-<div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;margin-bottom:20px">
-<h1>Store dashboard</h1>
-<div style="display:flex;gap:10px;align-items:center"><span id="lastUpdated" style="font-size:13px;color:#666"></span><button id="refreshBtn" style="padding:10px 18px;border-radius:999px;border:0;background:#111;color:#fff;cursor:pointer">Refresh</button></div>
-</div>
-<div id="dashboardMessage" style="margin-bottom:16px"></div>
-<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px;margin-bottom:24px">
-<div style="background:#fff;padding:20px;border-radius:16px"><small>Revenue Today</small><h2 id="revenueToday">—</h2></div>
-<div style="background:#fff;padding:20px;border-radius:16px"><small>Revenue This Week</small><h2 id="revenueWeek">—</h2></div>
-<div style="background:#fff;padding:20px;border-radius:16px"><small>Revenue This Month</small><h2 id="revenueMonth">—</h2></div>
-<div style="background:#fff;padding:20px;border-radius:16px"><small>Orders Today</small><h2 id="ordersToday">—</h2></div>
-<div style="background:#fff;padding:20px;border-radius:16px"><small>Average Rating</small><h2 id="averageRating">—</h2><small id="reviewCount"></small></div>
-</div>
-<div style="display:grid;grid-template-columns:2fr 1fr;gap:20px">
-<div><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px"><h2>Orders</h2><select id="orderStatusFilter" style="padding:8px 12px;border-radius:999px;border:1px solid #ddd"><option value="all">All statuses</option><option value="new">New order</option><option value="preparing">Preparing</option><option value="ready">Ready for collection</option><option value="completed">Completed / paid</option><option value="cancelled">Cancelled</option></select></div><div id="ordersList"></div></div>
-<div><h2>Reviews</h2><div id="reviewsList"></div></div>
-</div>
-</div>
-</main>
+<html>
+<body style="font-family:sans-serif;padding:20px">
+<h2>Supabase Login Test</h2>
+<input id="email" placeholder="email" style="width:100%;padding:12px;margin:8px 0" value="plethabo434@gmail.com">
+<input id="pass" type="password" placeholder="password" style="width:100%;padding:12px;margin:8px 0">
+<button id="btn" style="padding:12px 24px">TEST LOGIN</button>
+<pre id="out" style="background:#eee;padding:16px;margin-top:16px;white-space:pre-wrap"></pre>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.7/dist/umd/supabase.min.js"></script>
-<script src="admin.js"></script>
+<script>
+const URL='https://texzgslhswsyooixscmz.supabase.co';
+const KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRleHpnc2xoc3dzeW9vaXhzY216Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTIxMDE2NDEsImV4cCI6MjEwNzY3NzY0MX0.Ui612PvVsw3jpT_WnR3U4ve8zNpYfcdHSd7KfuKv9U8';
+const client=window.supabase.createClient(URL,KEY);
+document.getElementById('btn').onclick=async()=>{
+  const email=document.getElementById('email').value.trim();
+  const password=document.getElementById('pass').value;
+  document.getElementById('out').textContent='Trying... URL:'+URL+'\nEmail:'+email;
+  const {data,error}=await client.auth.signInWithPassword({email,password});
+  document.getElementById('out').textContent=JSON.stringify({data,error},null,2);
+};
+</script>
 </body>
 </html>
