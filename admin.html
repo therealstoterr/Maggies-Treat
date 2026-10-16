@@ -1,23 +1,37 @@
 <!doctype html>
 <html>
 <body style="font-family:sans-serif;padding:20px">
-<h2>Supabase Login Test</h2>
+<h2>Supabase Login Test - DEBUG</h2>
+<div id="status" style="padding:10px;background:yellow;margin-bottom:10px">Loading supabase lib...</div>
 <input id="email" placeholder="email" style="width:100%;padding:12px;margin:8px 0" value="plethabo434@gmail.com">
 <input id="pass" type="password" placeholder="password" style="width:100%;padding:12px;margin:8px 0">
 <button id="btn" style="padding:12px 24px">TEST LOGIN</button>
-<pre id="out" style="background:#eee;padding:16px;margin-top:16px;white-space:pre-wrap"></pre>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.7/dist/umd/supabase.min.js"></script>
+<pre id="out" style="background:#eee;padding:16px;margin-top:16px;white-space:pre-wrap;min-height:100px;border:1px solid #ccc"></pre>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.7/dist/umd/supabase.min.js" onload="document.getElementById('status').innerHTML='Supabase lib LOADED ✓';document.getElementById('status').style.background='#aaffaa'" onerror="document.getElementById('status').innerHTML='Supabase lib FAILED TO LOAD - check internet';document.getElementById('status').style.background='#ffaaaa'"></script>
 <script>
-const URL='https://texzgslhswsyooixscmz.supabase.co';
-const KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRleHpnc2xoc3dzeW9vaXhzY216Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTIxMDE2NDEsImV4cCI6MjEwNzY3NzY0MX0.Ui612PvVsw3jpT_WnR3U4ve8zNpYfcdHSd7KfuKv9U8';
-const client=window.supabase.createClient(URL,KEY);
-document.getElementById('btn').onclick=async()=>{
-  const email=document.getElementById('email').value.trim();
-  const password=document.getElementById('pass').value;
-  document.getElementById('out').textContent='Trying... URL:'+URL+'\nEmail:'+email;
-  const {data,error}=await client.auth.signInWithPassword({email,password});
-  document.getElementById('out').textContent=JSON.stringify({data,error},null,2);
-};
+setTimeout(()=>{
+  if(!window.supabase){
+    document.getElementById('status').innerHTML='ERROR: window.supabase is undefined - CDN blocked';
+    document.getElementById('status').style.background='#ffaaaa';
+    return;
+  }
+  const URL='https://texzgslhswsyooixscmz.supabase.co';
+  const KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRleHpnc2xoc3dzeW9vaXhzY216Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTIxMDE2NDEsImV4cCI6MjEwNzY3NzY0MX0.Ui612PvVsw3jpT_WnR3U4ve8zNpYfcdHSd7KfuKv9U8';
+  let client;
+  try{ client=window.supabase.createClient(URL,KEY); }catch(e){ document.getElementById('out').textContent='Create client failed: '+e.message; return; }
+  document.getElementById('btn').onclick=async()=>{
+    const email=document.getElementById('email').value.trim();
+    const password=document.getElementById('pass').value;
+    document.getElementById('out').textContent='Trying login...\nURL:'+URL+'\nEmail:'+email+'\nKey starts:'+KEY.substring(0,20)+'...';
+    try{
+      const {data,error}=await client.auth.signInWithPassword({email,password});
+      document.getElementById('out').textContent='RESULT:\nData:'+JSON.stringify(data,null,2)+'\n\nError:'+JSON.stringify(error,null,2);
+      if(data.session){ document.getElementById('out').textContent+='\n\n✓ LOGIN SUCCESS!'; }
+    }catch(err){
+      document.getElementById('out').textContent='EXCEPTION: '+err.message+'\n'+err.stack;
+    }
+  };
+},1000);
 </script>
 </body>
 </html>
