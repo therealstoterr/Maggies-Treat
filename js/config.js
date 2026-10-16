@@ -4,8 +4,7 @@
   The public anon key is meant for browser use; database Row Level Security protects private orders.
   NEVER paste a Supabase service_role/secret key into this file.
 */
-window.MT_CONFIG = {
-  supabaseUrl: "https://therealstoterr.supabase.co",
-  supabasePublishableKey: "eyJ071104668208189621312026",
-  adminEmail: "plethabo434@gmail.com"
-};
+const SUPABASE_URL = 'https://texzgslhswsyooixscmz.supabase.co';
+const SUPABASE_ANON_KEY = 'sb_publishable_aVVNNntwsS4oqDdQNzIlEw_gEsUTf6O';
+
+const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
