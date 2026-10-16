@@ -42,11 +42,9 @@
         </div>
       </div>
               <div class="hero-visual" style="background:transparent;border:none;padding:0;display:grid;gap:16px;place-items:center">
-        <!-- CIRCLE HOLDER BOX -->
         <div style="width:320px;height:320px;max-width:90vw;border-radius:50%;background:#fffaf2;border:1px solid #f0e6d8;display:grid;place-items:center;padding:14px;box-shadow:0 10px 30px rgba(0,0,0,.06)">
           <img src="logo.jpg" alt="Maggie's Treat" style="width:100%;height:100%;border-radius:50%;object-fit:cover;display:block;border:6px solid #fff;box-shadow:0 8px 20px rgba(0,0,0,.08);background:#fff">
         </div>
-        <!-- caption below circle -->
         <div style="padding:10px 16px;display:flex;flex-wrap:wrap;gap:10px;justify-content:center;align-items:center;background:#fff;border-radius:999px;border:1px solid #f0e6d8;box-shadow:0 4px 20px rgba(0,0,0,.05)">
           <span style="font-weight:800;font-size:13px">✦ Wraps • Shawarma • Ice cream</span>
           <span style="background:#111;color:#fff;padding:6px 12px;border-radius:999px;font-size:11px;font-weight:800">MADE WITH LOVE ♥</span>
@@ -67,11 +65,9 @@
       </div>
       <div class="menu-toolbar">
         <div id="menuFilters" class="filter-pills" aria-label="Filter menu by category"></div>
-        <span id="menuConnection" class="connection-note">Prices shown below</span>
+        <span id="menuConnection" class="connection-note">Pickup only - Collection</span>
       </div>
-      <div id="menuGrid" class="menu-grid" aria-live="polite">
-        <div class="loading-card">Getting the menu ready…</div>
-      </div>
+      <div id="menuGrid" class="menu-grid" aria-live="polite"></div>
     </section>
 
     <section class="order-section" id="order">
@@ -87,7 +83,7 @@
           <div class="checkout-heading"><div><span class="eyebrow">STEP 1</span><h3>Your basket</h3></div><span class="basket-count" id="basketCount">0 items</span></div>
           <div id="cartItems" class="cart-items"><div class="empty-cart">Your basket is empty. Add a favourite from the menu first.</div></div>
           <div class="cart-total"><span>Estimated total</span><strong id="cartTotal">R0</strong></div>
-          <p class="fine-print">Your final total is confirmed when we receive your order.</p>
+          <p class="fine-print">Collection only. Pay on collection.</p>
           <div class="form-divider"></div>
           <div class="checkout-heading"><div><span class="eyebrow">STEP 2</span><h3>Your details</h3></div></div>
           <form id="orderForm" class="form-stack">
@@ -97,9 +93,9 @@
             <input id="customerPhone" name="customerPhone" type="tel" autocomplete="tel" inputmode="tel" maxlength="25" placeholder="e.g. 081 234 5678" required>
             <label for="orderNote">Anything we should know? <small>(optional)</small></label>
             <textarea id="orderNote" name="orderNote" rows="3" maxlength="500" placeholder="Extra sauce, collection details, or special requests…"></textarea>
-            <button class="button button-full" type="submit" id="submitOrderBtn">Place my order <span aria-hidden="true">→</span></button>
+            <button class="button button-full" type="submit" id="submitOrderBtn">Place my order → WhatsApp <span aria-hidden="true">→</span></button>
             <p class="form-message" id="orderMessage" role="status" aria-live="polite"></p>
-            <p class="privacy-note">Your phone number and order details are used to manage your order. Please double-check your contact number.</p>
+            <p class="privacy-note">Your order will open in WhatsApp for confirmation.</p>
           </form>
         </div>
       </div>
@@ -135,8 +131,6 @@
 
   <footer class="site-footer"><a class="footer-brand" href="#home">MAGGIE'S <span>TREAT</span></a><p>Fresh • Tasty • Local</p><div class="footer-links"><a href="#menu">Menu</a><a href="#order">Order</a><a href="#reviews">Reviews</a><a href="admin.html">Admin login</a></div><small>© <span id="currentYear"></span> Maggie’s Treat. All rights reserved.</small></footer>
 
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script src="js/config.js"></script>
   <script src="js/app.js"></script>
 </body>
-</html>
+                                                                                       </html>
