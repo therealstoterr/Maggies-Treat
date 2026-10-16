@@ -18,6 +18,7 @@
 .order-items li{display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px dashed #eee}
 .order-status{padding:4px 10px;border-radius:999px;background:#eee;font-size:12px}
 .status-preparing{background:#ffe6cc}.status-ready{background:#d4edda}.status-completed{background:#cce5ff}.status-cancelled{background:#f8d7da}
+.loading-card,.empty-state{background:#fff;padding:20px;border-radius:16px;text-align:center}
 </style>
 </head>
 <body class="admin-body">
@@ -26,8 +27,7 @@
 <div><a href="index.html" style="margin-right:12px">View shop</a><button id="logoutBtn" class="hidden" style="padding:8px 16px;border-radius:999px;border:1px solid #ddd;background:#fff;cursor:pointer">Log out</button></div>
 </header>
 <main style="padding:20px;max-width:1200px;margin:0 auto">
-<div id="setupNotice" class="hidden" style="background:#fff3cd;padding:20px;border-radius:16px;margin:20px 0"><h3>Setup needed</h3><p>Check config.js - supabaseUrl, supabasePublishableKey, adminEmail must be set and not contain PASTE_.</p></div>
-
+<div id="setupNotice" class="hidden" style="background:#fff3cd;padding:20px;border-radius:16px;margin:20px 0"><h3>Setup needed</h3><p>Check config.js - supabaseUrl, supabasePublishableKey, adminEmail must be set.</p></div>
 <div id="loginPanel" class="login-panel">
 <span class="eyebrow">PRIVATE AREA</span><h1>Welcome back.</h1>
 <div id="loginMessage"></div>
@@ -39,7 +39,6 @@
 <button class="button" type="submit">Sign in to dashboard →</button>
 </form>
 </div>
-
 <div id="dashboardPanel" class="hidden">
 <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;margin-bottom:20px">
 <h1>Store dashboard</h1>
