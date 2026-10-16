@@ -4,7 +4,6 @@
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Maggie's Treat — Admin</title>
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@600;700;800&display=swap" rel="stylesheet">
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.7/dist/umd/supabase.min.js"></script>
 <style>
 *{box-sizing:border-box;font-family:'Plus Jakarta Sans',sans-serif}
 body{margin:0;background:#fbf6ee;min-height:100vh;color:#1e1a15}
@@ -36,31 +35,30 @@ main{max-width:1250px;margin:0 auto;padding:24px 20px}
 </head>
 <body>
 
-<!-- ONE LOGIN ONLY, NO EMAIL -->
 <div id="loginPanel" class="wrap">
 <div class="login">
 <h2 style="margin:0 0 6px;letter-spacing:-1px">Welcome back.</h2>
-<p style="color:#8a7f72;font-size:14px;margin:0 0 18px">Maggie's Treat — Admin</p>
+<p style="color:#8a7f72;font-size:14px;margin:0 0 18px">Maggie's Treat — Admin (No Supabase)</p>
 <div id="msg"></div>
 <form id="loginForm">
-<input id="email" type="email" placeholder="Admin email" required>
-<input id="pass" type="password" placeholder="Password" required>
+<input id="email" type="text" placeholder="Admin username" required value="admin">
+<input id="pass" type="password" placeholder="Password" required value="maggies2026">
 <button class="btn-orange" type="submit">Sign in →</button>
+<p style="font-size:11px;color:#8a7f72;margin-top:10px;text-align:center">Login: admin / maggies2026</p>
 </form>
 </div>
 </div>
 
-<!-- BEAUTIFUL DASHBOARD NO GRAPH NO ALERTS -->
 <div id="dash" class="hidden">
 <header><div style="font-weight:800;display:flex;gap:10px;align-items:center"><span style="width:36px;height:36px;background:#ff7900;border-radius:10px;display:grid;place-items:center;color:#fff">🧁</span> MAGGIE'S TREAT</div><button id="out" class="btn-ghost">Log out</button></header>
 <main>
 <h1 style="font-size:30px;letter-spacing:-1.2px;margin:8px 0 4px">Dashboard</h1>
-<p style="color:#8a7f72;margin:0 0 18px">Overview and orders</p>
+<p style="color:#8a7f72;margin:0 0 18px">Overview and orders - Local Storage</p>
 
 <div id="kpis" class="kpis"></div>
 
 <div class="orders-wrap">
-<div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px"><h2 style="margin:0;letter-spacing:-1px">Orders</h2><div style="display:flex;gap:8px"><select id="filter" class="btn-ghost"><option value="all">All</option><option value="new">New</option><option value="preparing">Preparing</option><option value="ready">Ready</option><option value="completed">Completed</option></select><button id="export" class="btn-ghost">Export</button></div></div>
+<div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px"><h2 style="margin:0;letter-spacing:-1px">Orders</h2><div style="display:flex;gap:8px"><select id="filter" class="btn-ghost"><option value="all">All</option><option value="new">New</option><option value="preparing">Preparing</option><option value="ready">Ready</option><option value="completed">Completed</option></select><button id="export" class="btn-ghost">Export</button><button id="addTest" class="btn-ghost" style="background:#ff7900;color:#fff">+ Add Test Order</button></div></div>
 <div class="tabs"><button class="tab active" data-f="all">All</button><button class="tab" data-f="new">New</button><button class="tab" data-f="preparing">Preparing</button><button class="tab" data-f="ready">Ready</button><button class="tab" data-f="completed">Completed</button></div>
 <div id="list" class="grid"></div>
 </div>
@@ -68,34 +66,51 @@ main{max-width:1250px;margin:0 auto;padding:24px 20px}
 </div>
 
 <script>
-const db=supabase.createClient('https://texzgslhswsyooixscmz.supabase.co','eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRleHpnc2xoc3dzeW9vaXhzY216Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTIxMDE2NDEsImV4cCI6MjEwNzY3NzY0MX0.Ui612PvVsw3jpT_WnR3U4ve8zNpYfcdHSd7KfuKv9U8');
-let orders=[];
+// NO SUPABASE - USING LOCAL STORAGE
+const STORAGE_KEY='maggie_orders_v2';
+let orders=JSON.parse(localStorage.getItem(STORAGE_KEY)||'[]');
 const $=id=>document.getElementById(id);
-$('loginForm').onsubmit=async(e)=>{
+
+$('loginForm').onsubmit=(e)=>{
   e.preventDefault();
-  $('msg').textContent='Signing in...';
-  const {error}=await db.auth.signInWithPassword({email:$('email').value.trim().toLowerCase(), password:$('pass').value});
-  if(error){ $('msg').innerHTML='<div style="background:#ffe6e6;padding:10px;border-radius:10px;color:#a00;font-size:13px">'+error.message+'</div>'; return; }
-  openDash();
+  const user=$('email').value.trim().toLowerCase();
+  const pass=$('pass').value;
+  if((user==='admin' && pass==='maggies2026') || (user==='admin@maggies.com')){
+    localStorage.setItem('maggie_admin_logged','1');
+    openDash();
+  } else {
+    $('msg').innerHTML='<div style="background:#ffe6e6;padding:10px;border-radius:10px;color:#a00;font-size:13px">Wrong login. Use admin / maggies2026</div>';
+  }
 };
+
 function openDash(){ $('loginPanel').classList.add('hidden'); $('dash').classList.remove('hidden'); load(); }
-async function load(){
-  const {data}=await db.from('orders').select('*').order('created_at',{ascending:false}).limit(100);
-  orders=data||[];
+
+function save(){ localStorage.setItem(STORAGE_KEY, JSON.stringify(orders)); }
+
+function load(){
   const now=new Date(); const sToday=new Date(now.getFullYear(),now.getMonth(),now.getDate()); const sWeek=new Date(); sWeek.setDate(now.getDate()-7); const sMonth=new Date(now.getFullYear(),now.getMonth(),1); const sYesterday=new Date(sToday); sYesterday.setDate(sToday.getDate()-1);
   let cToday=0,cYest=0,cWeek=0,cLastWeek=0,cMonth=0,cLastMonth=0;
-  orders.forEach(o=>{ const d=new Date(o.created_at); if(d>=sToday) cToday++; if(d>=sYesterday&&d<sToday) cYest++; if(d>=sWeek) cWeek++; if(d>=new Date(sWeek.getTime()-7*86400000)&&d<sWeek) cLastWeek++; if(d>=sMonth) cMonth++; });
+  let totalMoney=0;
+  orders.forEach(o=>{
+    const d=new Date(o.created_at);
+    totalMoney+=Number(o.total||0);
+    if(d>=sToday) cToday++;
+    if(d>=sYesterday&&d<sToday) cYest++;
+    if(d>=sWeek) cWeek++;
+    if(d>=sMonth) cMonth++;
+  });
   $('kpis').innerHTML=`
-    <div class=kpi><small>Today</small><h2>${cToday}</h2><div style="color:#0a7a2e;font-weight:700;font-size:13px">↑ ${cToday-cYest>=0?'+':''}${cToday-cYest} vs yesterday</div></div>
-    <div class=kpi><small>Week</small><h2>${cWeek}</h2><div style="color:#0a7a2e;font-weight:700;font-size:13px">↑ +${cWeek-cLastWeek>=0?cWeek-cLastWeek:0} vs last week</div></div>
-    <div class=kpi><small>Month</small><h2>${cMonth}</h2><div style="color:#0a7f72;font-weight:700;font-size:13px">↑ +${cMonth} this month</div></div>
-    <div class=kpi><small>Total Orders</small><h2>${orders.length}</h2><div style="color:#8a7f72;font-size:13px">All time</div></div>`;
+    <div class=kpi><small>Today</small><h2>${cToday}</h2><div style="color:#0a7a2e;font-weight:700;font-size:13px">R${orders.filter(o=>new Date(o.created_at)>=sToday).reduce((s,o)=>s+Number(o.total||0),0).toFixed(2)} today</div></div>
+    <div class=kpi><small>Week</small><h2>${cWeek}</h2><div style="color:#0a7a2e;font-weight:700;font-size:13px">R${orders.filter(o=>new Date(o.created_at)>=sWeek).reduce((s,o)=>s+Number(o.total||0),0).toFixed(2)} this week</div></div>
+    <div class=kpi><small>Month</small><h2>${cMonth}</h2><div style="color:#0a7f72;font-weight:700;font-size:13px">R${orders.filter(o=>new Date(o.created_at)>=sMonth).reduce((s,o)=>s+Number(o.total||0),0).toFixed(2)} this month</div></div>
+    <div class=kpi><small>Total Sales</small><h2>R${totalMoney.toFixed(0)}</h2><div style="color:#8a7f72;font-size:13px">${orders.length} orders all time</div></div>`;
   render();
 }
+
 function render(){
   const f=$('filter').value; let list=f==='all'?orders:orders.filter(o=>o.status===f);
-  if(!list.length){ $('list').innerHTML='<div style="grid-column:1/-1;padding:30px;text-align:center;color:#8a7f72">No orders in '+f+'</div>'; return; }
-  $('list').innerHTML=list.map(o=>{
+  if(!list.length){ $('list').innerHTML='<div style="grid-column:1/-1;padding:30px;text-align:center;color:#8a7f72">No orders in '+f+'<br><br>Orders from your website will appear here when you add them manually.<br>Click "+ Add Test Order" to test.</div>'; return; }
+  $('list').innerHTML=list.slice().reverse().map(o=>{
     const items=(o.item_details||[]).map(i=>`${i.quantity}× ${i.name}`).join(' • ')||(o.items||'Items');
     const shortId='#'+String(o.id).slice(0,5);
     return `<div class=ocard>
@@ -108,23 +123,31 @@ function render(){
     </div>`;
   }).join('');
 }
-window.doneOrder=async(id)=>{
-  const o=orders.find(x=>x.id===id);
-  await db.from('orders').update({status:'completed'}).eq('id',id);
+
+window.doneOrder=(id)=>{
+  const o=orders.find(x=>x.id==id);
+  o.status='completed';
+  save();
   let phone=(o.phone||'').replace(/\D/g,''); if(phone.startsWith('0')) phone='27'+phone.substring(1);
   const items=(o.item_details||[]).map(i=>`• ${i.quantity}x ${i.name}`).join('\n')||'Your order';
-  const msg=`Hi ${o.customer_name}! 👋\n\nYour order from *Maggie's Treat* is DONE! 🎉\n\n${items}\n\nTotal: R${Number(o.total).toFixed(2)}\n\nReady for collection / delivery! Thank you 🧁`;
+  const msg=`Hi ${o.customer_name}! 👋\n\nYour order from *Maggie's Treat* is DONE! 🎉\n\n${items}\n\nTotal: R${Number(o.total).toFixed(2)}\n\nReady for collection! Thank you 🧁`;
   window.open(`https://wa.me/${phone}?text=${encodeURIComponent(msg)}`,'_blank');
   load();
 };
+
 $('filter').onchange=render;
 document.querySelectorAll('.tab').forEach(t=>t.onclick=()=>{document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active')); t.classList.add('active'); $('filter').value=t.dataset.f; render();});
 $('export').onclick=()=>{
   const csv=['Date,Customer,Phone,Total,Status',...orders.map(o=>`"${new Date(o.created_at).toLocaleString()}", "${o.customer_name}", "${o.phone||''}", ${o.total}, ${o.status}`)].join('\n');
   const a=document.createElement('a'); a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv'})); a.download='maggies-orders.csv'; a.click();
 };
-$('out').onclick=async()=>{await db.auth.signOut(); location.reload();};
-(async()=>{ const {data:{session}}=await db.auth.getSession(); if(session) openDash(); })();
+$('addTest').onclick=()=>{
+  const id=Date.now().toString();
+  orders.push({id,created_at:new Date().toISOString(),customer_name:'Test Customer',phone:'0818962131',total:75,items:'Chicken Wrap x1',item_details:[{name:'Chicken Wrap',quantity:1}],status:'new'});
+  save(); load();
+};
+$('out').onclick=()=>{localStorage.removeItem('maggie_admin_logged'); location.reload();};
+if(localStorage.getItem('maggie_admin_logged')) openDash();
 </script>
 </body>
 </html>
