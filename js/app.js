@@ -1,16 +1,8 @@
 (() => {
   'use strict';
 
-  const config = window.MT_CONFIG || {};
-  const configured = Boolean(
-    config.supabaseUrl && config.supabasePublishableKey &&
-    config.supabaseUrl.startsWith('https://') &&
-   !config.supabaseUrl.includes('PASTE_') &&
-   !config.supabasePublishableKey.includes('PASTE_') &&
-    window.supabase && typeof window.supabase.createClient === 'function'
-  );
-  const db = configured? window.supabase.createClient(config.supabaseUrl, config.supabasePublishableKey) : null;
-  const businessPhone = '27818962131';
+  const businessPhone = '+27818962131';
+  const STORAGE_KEY = 'maggie_orders_v2';
 
   const fallbackMenu = [
     {id:'wrap-classic-chicken',name:'Classic Chicken Wrap',category:'Chicken Wraps',price:30,description:'A classic, satisfying chicken wrap.',emoji:'🌯',display_order:1},
@@ -40,10 +32,10 @@
 
   const $ = (id) => document.getElementById(id);
   const money = (amount) => new Intl.NumberFormat('en-ZA', {style:'currency',currency:'ZAR',maximumFractionDigits:0}).format(Number(amount || 0));
-  const escapeHtml = (value) => String(value?? '').replace(/[&<>"']/g, (character) => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[character]));
+  const escapeHtml = (value) => String(value?? '').replace(/[&<>"']/g, (c) => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
   const menuById = () => new Map(menu.map((item) => [item.id, item]));
-  const cartQuantity = () => Object.values(cart).reduce((sum, quantity) => sum + quantity, 0);
-  const cartTotal = () => Object.entries(cart).reduce((sum, [id, quantity]) => sum + (Number(menuById().get(id)?.price) || 0) * quantity, 0);
+  const cartQuantity = () => Object.values(cart).reduce((sum, q) => sum + q, 0);
+  const cartTotal = () => Object.entries(cart).reduce((sum, [id, q]) => sum + (Number(menuById().get(id)?.price) || 0) * q, 0);
 
   function displayPrice(item) {
     if (item.price_label) return item.price_label;
@@ -90,13 +82,11 @@
     } else {
       container.innerHTML = items.map(([id, quantity]) => {
         const item = menuById().get(id);
-        return `<div class="cart-row"><div><div class="cart-row-name">${escapeHtml(item.name)}</div><div class="cart-row-price">${money(item.price)} × ${quantity} = ${money(Number(item.price) * quantity)}</div></div><div class="cart-controls"><button type="button" data-cart-change="-1" data-id="${escapeHtml(id)}" aria-label="Remove one ${escapeHtml(item.name)}">−</button><span class="cart-qty">${quantity}</span><button type="button" data-cart-change="1" data-id="${escapeHtml(id)}" aria-label="Add one ${escapeHtml(item.name)}">+</button></div></div>`;
+        return `<div class="cart-row"><div><div class="cart-row-name">${escapeHtml(item.name)}</div><div class="cart-row-price">${money(item.price)} × ${quantity} = ${money(Number(item.price) * quantity)}</div></div><div class="cart-controls"><button type="button" data-cart-change="-1" data-id="${escapeHtml(id)}">−</button><span class="cart-qty">${quantity}</span><button type="button" data-cart-change="1" data-id="${escapeHtml(id)}">+</button></div></div>`;
       }).join('');
     }
-    const basketCountEl = $('basketCount');
-    const cartTotalEl = $('cartTotal');
-    if(basketCountEl) basketCountEl.textContent = `${cartQuantity()} ${cartQuantity() === 1? 'item' : 'items'}`;
-    if(cartTotalEl) cartTotalEl.textContent = money(cartTotal());
+    $('basketCount').textContent = `${cartQuantity()} ${cartQuantity() === 1? 'item' : 'items'}`;
+    $('cartTotal').textContent = money(cartTotal());
     renderMenu();
   }
 
@@ -112,29 +102,6 @@
     renderCart();
   }
 
-  async function loadMenu() {
-    const note = $('menuConnection');
-    if (!db) {
-      if (note) note.textContent = 'Online order storage not connected yet';
-      return;
-    }
-    try {
-      const {data, error} = await db.from('menu_items').select('id,name,category,price,price_label,description,emoji,display_order,active').eq('active', true).order('display_order', {ascending:true});
-      if (error) throw error;
-      if (Array.isArray(data) && data.length) {
-        menu = data.map((item) => ({...item, price:Number(item.price)}));
-        cart = Object.fromEntries(Object.entries(cart).filter(([id]) => menuById().has(id)));
-        renderFilters();
-        renderMenu();
-        renderCart();
-        if (note) note.textContent = 'Live menu connected';
-      }
-    } catch (error) {
-      console.error('Menu could not be loaded from Supabase:', error);
-      if (note) note.textContent = 'Showing menu prices saved in the website';
-    }
-  }
-
   function orderMessage(name, phone, note) {
     const lines = Object.entries(cart).map(([id, qty]) => {
       const item = menuById().get(id);
@@ -143,7 +110,7 @@
     return `Hi Maggie's Treat! I'd like to place a pickup order.\n\nName: ${name}\nPhone: ${phone}\n\nOrder:\n${lines.join('\n')}\n\nEstimated total: ${money(cartTotal())}${note? `\nNote: ${note}` : ''}\n\nPickup: 9440 Ext 2, Adonis Street, Soshanguve.`;
   }
 
-  async function submitOrder(event) {
+  function submitOrder(event) {
     event.preventDefault();
     const message = $('orderMessage');
     const button = $('submitOrderBtn');
@@ -156,117 +123,81 @@
     const note = $('orderNote').value.trim();
     if (name.length < 2) {
       setMessage(message, 'Please enter your name.', true);
-      $('customerName').focus();
       return;
     }
     if (!/^[0-9+()\s-]{7,25}$/.test(phone) || phone.replace(/\D/g, '').length < 7) {
-      setMessage(message, 'Please enter a valid phone number so we can contact you.', true);
-      $('customerPhone').focus();
+      setMessage(message, 'Please enter a valid phone number.', true);
       return;
     }
+
+    // SAVE TO LOCAL STORAGE FOR ADMIN - NO SUPABASE
+    let orders = JSON.parse(localStorage.getItem(STORAGE_KEY)||'[]');
+    const orderId = Date.now().toString();
+    orders.push({
+      id: orderId,
+      created_at: new Date().toISOString(),
+      customer_name: name,
+      phone: phone,
+      total: cartTotal(),
+      items: Object.entries(cart).map(([id,qty])=>`${qty}x ${menuById().get(id).name}`).join(', '),
+      item_details: Object.entries(cart).map(([id,quantity])=>({name:menuById().get(id).name, quantity, price:menuById().get(id).price})),
+      status: 'new',
+      order_note: note
+    });
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(orders));
 
     const waText = orderMessage(name, phone, note);
     const whatsappUrl = `https://wa.me/${businessPhone}?text=${encodeURIComponent(waText)}`;
 
-    if (!db) {
-      setMessage(message, 'Opening WhatsApp so you can send the order directly.', false);
-      window.open(whatsappUrl, '_blank', 'noopener,noreferrer');
-      return;
-    }
-
     button.disabled = true;
-    button.textContent = 'Sending your order…';
-    setMessage(message, 'Sending your order securely…');
+    setMessage(message, 'Order saved! Opening WhatsApp...');
+    window.open(whatsappUrl, '_blank', 'noopener,noreferrer');
 
-    try {
-      const payload = {
-        customer_name: name,
-        customer_phone: phone,
-        items: Object.entries(cart).map(([id, quantity]) => {
-          const it = menuById().get(id);
-          return { id, name: it.name, quantity, price: it.price, line_total: it.price * quantity };
-        }),
-        total: cartTotal(),
-        order_note: note || null,
-        status: 'new'
-      };
-      const {error} = await db.from('orders').insert(payload);
-      if (error) throw error;
-      setMessage(message, 'Order received! Thank you. Opening WhatsApp to confirm pickup.');
-      window.open(whatsappUrl, '_blank', 'noopener,noreferrer');
+    setTimeout(()=>{
       cart = {};
       $('orderForm').reset();
       renderCart();
-    } catch (error) {
-      console.error('Order submission failed, still opening WhatsApp:', error);
-      setMessage(message, 'We could not save online but your WhatsApp order is ready. Please send it.', false);
-      window.open(whatsappUrl, '_blank', 'noopener,noreferrer');
-    } finally {
+      setMessage(message, 'Thank you! Order sent to WhatsApp for pickup confirmation. 🧁');
       button.disabled = false;
       button.innerHTML = 'Place my order <span aria-hidden="true">→</span>';
-    }
+    }, 1000);
   }
 
-  async function submitReview(event) {
+  function submitReview(event) {
     event.preventDefault();
-    const message = $('reviewMessage');
-    const button = $('submitReviewBtn');
     const name = $('reviewName').value.trim();
     const ratingElement = document.querySelector('input[name="rating"]:checked');
-    const comment = $('reviewComment').value.trim();
     if (!ratingElement) {
-      setMessage(message, 'Please select a star rating.', true);
+      setMessage($('reviewMessage'), 'Please select a star rating.', true);
       return;
     }
     if (name.length < 2) {
-      setMessage(message, 'Please enter your name.', true);
+      setMessage($('reviewMessage'), 'Please enter your name.', true);
       return;
     }
-    if (!db) {
-      setMessage(message, 'The review form will work after the website database is connected. Thank you for your patience.', true);
-      return;
-    }
-    button.disabled = true;
-    button.textContent = 'Sending review…';
-    try {
-      const {error} = await db.from('reviews').insert({customer_name:name, rating:Number(ratingElement.value), comment:comment || null});
-      if (error) throw error;
-      $('reviewForm').reset();
-      setMessage(message, 'Thank you for your review! We appreciate your support.');
-    } catch (error) {
-      console.error('Review submission failed:', error);
-      setMessage(message, 'Your review could not be saved just now. Please try again later.', true);
-    } finally {
-      button.disabled = false;
-      button.innerHTML = 'Send review <span aria-hidden="true">→</span>';
-    }
+    // Save review locally (no supabase)
+    let reviews = JSON.parse(localStorage.getItem('maggie_reviews')||'[]');
+    reviews.push({name, rating:ratingElement.value, comment:$('reviewComment').value, date:new Date().toISOString()});
+    localStorage.setItem('maggie_reviews', JSON.stringify(reviews));
+    $('reviewForm').reset();
+    setMessage($('reviewMessage'), `Thank you ${name}! ⭐${ratingElement.value} review saved. We appreciate you!`);
   }
 
   document.addEventListener('click', (event) => {
     const addButton = event.target.closest('[data-add]');
-    if (addButton) {
-      addItem(addButton.dataset.add, 1);
-      return;
-    }
+    if (addButton) { addItem(addButton.dataset.add, 1); return; }
     const cartButton = event.target.closest('[data-cart-change]');
-    if (cartButton) {
-      addItem(cartButton.dataset.id, Number(cartButton.dataset.cartChange));
-      return;
-    }
+    if (cartButton) { addItem(cartButton.dataset.id, Number(cartButton.dataset.cartChange)); return; }
     const filterButton = event.target.closest('[data-filter]');
-    if (filterButton) {
-      activeCategory = filterButton.dataset.filter;
-      renderFilters();
-      renderMenu();
-    }
+    if (filterButton) { activeCategory = filterButton.dataset.filter; renderFilters(); renderMenu(); }
   });
 
   $('orderForm')?.addEventListener('submit', submitOrder);
   $('reviewForm')?.addEventListener('submit', submitReview);
-  const yearEl = $('currentYear');
-  if(yearEl) yearEl.textContent = new Date().getFullYear();
+  if($('currentYear')) $('currentYear').textContent = new Date().getFullYear();
+  if($('menuConnection')) $('menuConnection').textContent = 'Pickup only - Collection • No database';
+
   renderFilters();
   renderMenu();
   renderCart();
-  loadMenu();
 })();
