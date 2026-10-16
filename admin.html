@@ -3,52 +3,97 @@
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Admin | Maggie's Treat</title>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;700;800&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.7/dist/umd/supabase.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
 <style>
-body{margin:0;background:#f7f1e8;font-family:sans-serif;display:block!important;min-height:100vh}
+*{box-sizing:border-box;font-family:'Plus Jakarta Sans',sans-serif}
+body{margin:0;background:#fbf6ee;min-height:100vh;display:block!important;color:#1a1a1a}
 .hidden{display:none!important}
-.login-panel{max-width:480px;margin:40px auto;background:#fff;padding:32px;border-radius:24px;box-shadow:0 8px 30px rgba(0,0,0,.08)}
-.login-panel input{width:100%;padding:14px;border-radius:12px;border:1px solid #ddd;margin:8px 0 16px}
-.button{width:100%;padding:14px;border-radius:999px;background:#ff7900;color:#fff;border:0;font-weight:700;cursor:pointer}
-.error{background:#ffe6e6;color:#a00;padding:12px;border-radius:10px;margin:10px 0}
-.card,.stat-card,.order-card{background:#fff;padding:16px;margin:12px 0;border-radius:16px;box-shadow:0 2px 10px rgba(0,0,0,.05)}
-.order-items{list-style:none;padding:0;margin:8px 0}
-.order-items li{display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px dashed #eee}
-.btn-done{background:#111;color:#fff;border:0;padding:10px 16px;border-radius:999px;font-weight:800;cursor:pointer}
-.badge{padding:4px 10px;border-radius:999px;font-size:11px;font-weight:800;text-transform:uppercase}
-.b-new{background:#fff1e0;color:#b65d00}.b-preparing{background:#e8f0ff;color:#2d5bd1}.b-ready,.b-completed{background:#e6f9ed;color:#0a7a2e}.b-cancelled{background:#ffe2e2;color:#a00}
+
+/* BEAUTIFUL LOGIN LIKE CUSTOMER SITE */
+.login-wrap{min-height:100vh;display:grid;place-items:center;padding:24px;background:radial-gradient(800px 400px at 20% 10%, #fff2e0 0%, transparent 70%), radial-gradient(600px 300px at 80% 90%, #ffe8cc 0%, transparent 60%), #fbf6ee}
+.login-card{width:100%;max-width:420px;background:#fff;border-radius:28px;padding:32px 28px;box-shadow:0 20px 60px rgba(0,0,0,.08);border:1px solid #f0e6d8}
+.brand{display:flex;align-items:center;gap:12px;margin-bottom:24px}
+.brand-icon{width:48px;height:48px;background:#ff7900;border-radius:14px;display:grid;place-items:center;font-size:24px;color:#fff}
+.brand b{font-size:20px;letter-spacing:-0.5px}
+.login-card h2{font-size:28px;margin:8px 0 6px;letter-spacing:-1px}
+.login-card p{color:#8a7f72;font-size:14px;margin:0 0 20px}
+.login-card input{width:100%;padding:16px 18px;border-radius:14px;border:1.5px solid #f0e6d8;background:#fdfaf5;margin:8px 0 14px;font-size:15px;outline:none}
+.login-card input:focus{border-color:#ff7900;background:#fff}
+.btn-orange{width:100%;padding:16px;border-radius:999px;background:#ff7900;color:#fff;border:0;font-weight:800;font-size:15px;cursor:pointer;box-shadow:0 8px 20px rgba(255,121,0,.3)}
+.error{background:#fff0f0;color:#a00;padding:12px;border-radius:12px;font-size:13px;margin:10px 0}
+
+/* BEAUTIFUL DASHBOARD */
+header{position:sticky;top:0;z-index:10;background:rgba(255,255,255,.9);backdrop-filter:blur(12px);border-bottom:1px solid #f0e6d8;padding:14px 24px;display:flex;justify-content:space-between;align-items:center}
+.h-title{font-weight:800;font-size:18px;display:flex;gap:10px;align-items:center}
+.h-title span{width:36px;height:36px;background:#ff7900;border-radius:10px;display:grid;place-items:center;color:#fff}
+main{max-width:1250px;margin:0 auto;padding:28px 20px}
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px;margin:18px 0}
+.kpi{background:#fff;border:1px solid #f0e6d8;border-radius:20px;padding:18px;box-shadow:0 2px 12px rgba(0,0,0,.03)}
+.kpi small{color:#8a7f72;font-weight:700;font-size:11px;letter-spacing:.8px;text-transform:uppercase}
+.kpi h2{margin:8px 0 2px;font-size:26px;letter-spacing:-1px}
+.card{background:#fff;border:1px solid #f0e6d8;border-radius:22px;padding:20px;box-shadow:0 2px 12px rgba(0,0,0,.03)}
+.tabs{display:flex;gap:8px;margin:20px 0;flex-wrap:wrap}
+.tab{padding:11px 18px;border-radius:999px;border:1.5px solid #f0e6d8;background:#fff;font-weight:700;cursor:pointer;transition:.2s}
+.tab.active{background:#111;color:#fff;border-color:#111}
+.order{border:1px solid #f5eee4;border-radius:20px;padding:16px;margin:12px 0;background:#fff;transition:.2s}
+.order:hover{border-color:#ff7900;box-shadow:0 8px 30px rgba(255,121,0,.12)}
+.order-top{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;align-items:center}
+.badge{padding:5px 12px;border-radius:999px;font-size:11px;font-weight:800;text-transform:uppercase}
+.b-new{background:#fff1e0;color:#b65d00}.b-preparing{background:#e8f0ff;color:#2d5bd1}.b-ready{background:#e6f9ed;color:#0a7a2e}.b-completed{background:#111;color:#fff}.b-cancelled{background:#ffe2e2;color:#a00}
+.items{list-style:none;padding:0;margin:10px 0}
+.items li{display:flex;justify-content:space-between;padding:7px 0;border-bottom:1px dashed #f0e6d8;font-size:14px}
+.btn-done{background:#111;color:#fff;border:0;padding:11px 18px;border-radius:999px;font-weight:800;cursor:pointer;display:flex;gap:8px;align-items:center}
+.btn-done:hover{background:#ff7900}
+.btn-ghost{padding:10px 16px;border-radius:999px;border:1.5px solid #f0e6d8;background:#fff;font-weight:700;cursor:pointer}
 </style>
 </head>
 <body>
-<header style="padding:16px;background:#fff;display:flex;justify-content:space-between;align-items:center"><strong>MAGGIE'S TREAT</strong><div><span id="liveDot" class="hidden" style="background:#1a9c5a;color:#fff;padding:6px 12px;border-radius:999px;font-size:12px;margin-right:8px">● LIVE</span><button id="logoutBtn" class="hidden" style="padding:8px 16px;border-radius:999px;border:1px solid #ddd;background:#fff">Log out</button></div></header>
 
-<main style="padding:20px;max-width:1100px;margin:0 auto">
-<!-- SINGLE LOGIN - YOUR WORKING ONE -->
-<div id="loginPanel" class="login-panel">
+<!-- BEAUTIFUL SINGLE LOGIN -->
+<div id="loginPanel" class="login-wrap">
+<div class="login-card">
+<div class="brand"><div class="brand-icon">🧁</div><b>MAGGIE'S TREAT</b></div>
 <h2>Welcome back.</h2>
+<p>Sign in to your store dashboard</p>
 <div id="loginMessage"></div>
 <form id="loginForm">
-<label>Admin email</label><input id="loginEmail" type="email" value="plethabo434@gmail.com" required>
-<label>Password</label><input id="loginPassword" type="password" required>
-<button class="button" type="submit">Sign in to dashboard →</button>
+<input id="loginEmail" type="email" value="plethabo434@gmail.com" placeholder="Admin email" required>
+<input id="loginPassword" type="password" placeholder="Password" required>
+<button class="btn-orange" type="submit">Sign in to dashboard →</button>
 </form>
 </div>
+</div>
 
+<!-- BEAUTIFUL DASHBOARD -->
 <div id="dashboardPanel" class="hidden">
-<h1>Store dashboard</h1>
-<div id="stats" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px"></div>
-<div class="card"><canvas id="revChart" height="90"></canvas></div>
+<header><div class="h-title"><span>🧁</span> MAGGIE'S TREAT</div><div style="display:flex;gap:10px;align-items:center"><span id="liveDot" style="background:#111;color:#fff;padding:7px 14px;border-radius:999px;font-size:12px;font-weight:700">● LIVE</span><button id="logoutBtn" class="btn-ghost">Log out</button></div></header>
+<main>
+<h1 style="font-size:32px;letter-spacing:-1.5px;margin:6px 0 2px">Store dashboard</h1>
+<p style="color:#8a7f72;margin:0 0 18px">Beautiful, fast, and ready for business</p>
 
-<div style="display:flex;gap:8px;flex-wrap:wrap;margin:16px 0">
-<select id="filter" style="padding:10px 14px;border-radius:999px"><option value="all">All orders</option><option value="new">New</option><option value="preparing">Preparing</option><option value="ready">Ready</option><option value="completed">Completed</option></select>
-<button id="exportBtn" style="padding:10px 16px;border-radius:999px;border:1px solid #ddd;background:#fff;font-weight:700">Export CSV</button>
-<button id="refreshBtn" style="padding:10px 16px;border-radius:999px;border:0;background:#111;color:#fff">Refresh</button>
+<div id="stats" class="kpis"></div>
+
+<div style="display:grid;grid-template-columns:1.3fr.7fr;gap:14px">
+<div class="card"><h3 style="margin:0 0 12px">Revenue • Last 7 days</h3><canvas id="revChart" height="130"></canvas></div>
+<div class="card"><h3 style="margin:0 0 12px">Top treats</h3><div id="topProducts"></div><div id="alerts" style="margin-top:14px"></div></div>
+</div>
+
+<div class="tabs">
+<button class="tab active" data-tab="orders">Orders</button>
+<button class="tab" data-tab="all">All</button>
+</div>
+
+<div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px">
+<select id="filter" class="btn-ghost"><option value="all">All status</option><option value="new">New</option><option value="preparing">Preparing</option><option value="ready">Ready</option><option value="completed">Completed</option></select>
+<button id="exportBtn" class="btn-ghost">📤 Export CSV</button>
+<button id="refreshBtn" class="btn-ghost">↻ Refresh</button>
 </div>
 
 <div id="ordersList"></div>
-</div>
 </main>
+</div>
 
 <script>
 const SUPABASE_URL='https://texzgslhswsyooixscmz.supabase.co';
@@ -57,7 +102,7 @@ const db=supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
 const $=id=>document.getElementById(id);
 let orders=[],chart=null;
 
-// YOUR WORKING LOGIN - NEVER BREAKS
+// ONE WORKING LOGIN
 $('loginForm').onsubmit=async(e)=>{
   e.preventDefault();
   $('loginMessage').textContent='Signing in…';
@@ -71,89 +116,66 @@ $('logoutBtn').onclick=async()=>{ await db.auth.signOut(); location.reload(); };
 $('refreshBtn').onclick=load;
 $('filter').onchange=render;
 
-async function openDash(){
-  $('loginPanel').classList.add('hidden');
-  $('dashboardPanel').classList.remove('hidden');
-  $('logoutBtn').classList.remove('hidden');
-  $('liveDot').classList.remove('hidden');
-  await load();
-}
+async function openDash(){ $('loginPanel').classList.add('hidden'); $('dashboardPanel').classList.remove('hidden'); await load(); }
 
 async function load(){
-  $('ordersList').innerHTML='<div class=card>Loading orders...</div>';
+  $('ordersList').innerHTML='<div class=card>Loading your beautiful orders...</div>';
   try{
     const {data,error}=await db.from('orders').select('*').order('created_at',{ascending:false}).limit(100);
     if(error) throw error;
     orders=data||[];
-
-    // Stats
-    const now=new Date(); const today=new Date(now.getFullYear(),now.getMonth(),now.getDate());
-    const week=new Date(); week.setDate(now.getDate()-7);
-    const month=new Date(now.getFullYear(),now.getMonth(),1);
-    let revToday=0, revWeek=0, revMonth=0, countToday=0;
-    orders.forEach(o=>{const d=new Date(o.created_at); const t=Number(o.total||0); if(d>=today){revToday+=t; countToday++;} if(d>=week) revWeek+=t; if(d>=month) revMonth+=t;});
-
+    const now=new Date(); const sToday=new Date(now.getFullYear(),now.getMonth(),now.getDate()); const sWeek=new Date(); sWeek.setDate(now.getDate()-7); const sMonth=new Date(now.getFullYear(),now.getMonth(),1);
+    let revToday=0, revWeek=0, revMonth=0, cToday=0;
+    orders.forEach(o=>{const d=new Date(o.created_at); const t=Number(o.total||0); if(d>=sToday){revToday+=t; cToday++;} if(d>=sWeek) revWeek+=t; if(d>=sMonth) revMonth+=t;});
     $('stats').innerHTML=`
-      <div class=stat-card><small>TODAY</small><h2 style="margin:6px 0">R ${revToday.toFixed(2)}</h2><small>${countToday} orders</small></div>
-      <div class=stat-card><small>WEEK</small><h2 style="margin:6px 0">R ${revWeek.toFixed(2)}</h2></div>
-      <div class=stat-card><small>MONTH</small><h2 style="margin:6px 0">R ${revMonth.toFixed(2)}</h2></div>
-      <div class=stat-card><small>TOTAL ORDERS</small><h2 style="margin:6px 0">${orders.length}</h2></div>
-    `;
+      <div class=kpi><small>Today</small><h2>R ${revToday.toFixed(2)}</h2><div style="font-size:12px;color:#1a9c5a;font-weight:700">${cToday} orders today</div></div>
+      <div class=kpi><small>This week</small><h2>R ${revWeek.toFixed(2)}</h2></div>
+      <div class=kpi><small>This month</small><h2>R ${revMonth.toFixed(2)}</h2></div>
+      <div class=kpi><small>Total orders</small><h2>${orders.length}</h2><div style="font-size:12px;color:#8a7f72">in last 100</div></div>`;
 
-    // Chart
     const days=[...Array(7)].map((_,i)=>{const d=new Date(); d.setDate(d.getDate()-6+i); return d;});
-    const revByDay=days.map(d=>{const s=new Date(d.getFullYear(),d.getMonth(),d.getDate()); const e=new Date(s); e.setDate(s.getDate()+1); let sum=0; orders.forEach(o=>{const od=new Date(o.created_at); if(od>=s&&od<e) sum+=Number(o.total||0)}); return sum;});
+    const rev=days.map(d=>{const s=new Date(d.getFullYear(),d.getMonth(),d.getDate()); const e=new Date(s); e.setDate(s.getDate()+1); let sum=0; orders.forEach(o=>{const od=new Date(o.created_at); if(od>=s&&od<e) sum+=Number(o.total||0)}); return sum;});
     if(chart) chart.destroy();
     chart=new Chart($('revChart'),{type:'bar',data:{labels:days.map(d=>d.toLocaleDateString('en-ZA',[STRIPPED]
 
-    render();
-  }catch(err){
-    $('ordersList').innerHTML=`<div class=error><b>Database error:</b> ${err.message}<br><br>Fix: Go to Supabase → SQL Editor → Run:<br><code>create policy "allow all" on orders for all using (true) with check (true);</code></div>`;
-  }
+    render(); renderTop();
+  }catch(err){ $('ordersList').innerHTML=`<div class=card style="border-color:#ffb4b4;background:#fff5f5"><b>Can't load orders:</b> ${err.message}<br><small>Check Supabase → orders table RLS policy</small></div>`; }
+}
+
+function renderTop(){
+  const top={}; orders.forEach(o=>{(o.item_details||[]).forEach(it=>{top[it.name]=(top[it.name]||0)+it.quantity;});});
+  $('topProducts').innerHTML=Object.entries(top).sort((a,b)=>b[1]-a[1]).slice(0,4).map(([n,q])=>`<div style="display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px dashed #f0e6d8"><span>${n}</span><b style="background:#111;color:#fff;padding:2px 10px;border-radius:999px;font-size:12px">${q} sold</b></div>`).join('')||'<small style="color:#8a7f72">No sales yet — create a test order</small>';
 }
 
 function render(){
-  const f=$('filter').value;
-  let list=f==='all'?orders:orders.filter(o=>o.status===f);
-  if(!list.length){ $('ordersList').innerHTML=`<div class=card>No orders in "${f}". Try "All" or create a test order from your site.</div>`; return; }
-
+  const f=$('filter').value; let list=f==='all'?orders:orders.filter(o=>o.status===f);
+  if(!list.length){ $('ordersList').innerHTML='<div class=card style="text-align:center;padding:40px"><div style="font-size:40px">🧁</div><h3>No orders</h3><p style="color:#8a7f72">New orders will appear here beautifully</p></div>'; return; }
   $('ordersList').innerHTML=list.map(o=>{
-    const items=Array.isArray(o.item_details)?o.item_details.map(i=>`<li><span>${i.quantity}× ${i.name}</span><span>R${Number(i.line_total||i.price*i.quantity||0).toFixed(2)}</span></li>`).join(''):`<li>${o.items||'No details'}</li>`;
-    const isDone=o.status==='completed';
-    return `<div class=order-card>
-      <div style="display:flex;justify-content:space-between"><b>${o.customer_name||'Customer'}</b><b>R${Number(o.total||0).toFixed(2)}</b></div>
-      <small>${new Date(o.created_at).toLocaleString('en-ZA')} • <span class=badge style="background:#${o.status==='new'?'fff1e0':'e6f9ed'}">${o.status}</span> • 📞 ${o.phone||'no phone'}</small>
-      <ul class=order-items>${items}</ul>
-      <div style="margin-top:12px;display:flex;gap:8px;flex-wrap:wrap">
-        ${isDone?`<span style="background:#e6f9ed;color:#0a7a2e;padding:8px 14px;border-radius:999px;font-weight:800">✓ DONE</span>`:`<button class=btn-done onclick="doneOrder('${o.id}')">DONE → WhatsApp</button>`}
-        <select onchange="updateStatus('${o.id}',this.value)" style="padding:8px 12px;border-radius:999px"><option value="new" ${o.status==='new'?'selected':''}>New</option><option value="preparing" ${o.status==='preparing'?'selected':''}>Preparing</option><option value="ready" ${o.status==='ready'?'selected':''}>Ready</option><option value="completed" ${o.status==='completed'?'selected':''}>Completed</option><option value="cancelled" ${o.status==='cancelled'?'selected':''}>Cancelled</option></select>
+    const items=Array.isArray(o.item_details)?o.item_details.map(i=>`<li><span>${i.quantity}× ${i.name}</span><span style="font-weight:700">R${Number(i.line_total||i.price*i.quantity||0).toFixed(2)}</span></li>`).join(''):'<li>No items</li>';
+    const done=o.status==='completed';
+    return `<div class=order>
+      <div class=order-top><div><b style="font-size:16px">${o.customer_name||'Customer'}</b><div style="font-size:12px;color:#8a7f72">${new Date(o.created_at).toLocaleString('en-ZA')} • 📞 ${o.phone||'no phone'}</div></div><div style="display:flex;gap:8px;align-items:center"><span class="badge b-${o.status}">${o.status}</span><b>R${Number(o.total||0).toFixed(2)}</b></div></div>
+      <ul class=items>${items}</ul>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:12px">
+        ${done?`<span style="background:#111;color:#fff;padding:10px 16px;border-radius:999px;font-weight:800;font-size:13px">✓ DONE</span>`:`<button class=btn-done onclick="doneOrder('${o.id}')">✓ DONE → WhatsApp customer</button>`}
+        <select onchange="updateStatus('${o.id}',this.value)" class=btn-ghost><option value="new" ${o.status==='new'?'selected':''}>New</option><option value="preparing" ${o.status==='preparing'?'selected':''}>Preparing</option><option value="ready" ${o.status==='ready'?'selected':''}>Ready</option><option value="completed" ${o.status==='completed'?'selected':''}>Completed</option><option value="cancelled" ${o.status==='cancelled'?'selected':''}>Cancelled</option></select>
       </div>
     </div>`;
   }).join('');
 }
 
 window.updateStatus=async(id,status)=>{ await db.from('orders').update({status}).eq('id',id); load(); };
-
 window.doneOrder=async(id)=>{
   const o=orders.find(x=>x.id===id); if(!o) return;
-  if(!confirm(`Mark order for ${o.customer_name} as DONE and WhatsApp them?`)) return;
-
   await db.from('orders').update({status:'completed'}).eq('id',id);
-
-  const itemsList=(o.item_details||[]).map(i=>`• ${i.quantity}x ${i.name}`).join('\n') || 'Your order';
-  const message=`Hi ${o.customer_name}! 👋\n\nYour order from *Maggie's Treat* is DONE! 🎉\n\n${itemsList}\n\nTotal: R${Number(o.total).toFixed(2)}\n\nReady for collection / delivery! Thank you for supporting us 🧁\n\n- Maggie's Treat`;
-
-  let phone=(o.phone||'').replace(/\D/g,'');
-  if(phone.startsWith('0')) phone='27'+phone.substring(1);
-
-  window.open(`https://wa.me/${phone}?text=${encodeURIComponent(message)}`,'_blank');
+  const list=(o.item_details||[]).map(i=>`• ${i.quantity}x ${i.name}`).join('\n')||'Your order';
+  const msg=`Hi ${o.customer_name}! 👋\n\nYour order from *Maggie's Treat* is DONE! 🎉\n\n${list}\n\nTotal: R${Number(o.total).toFixed(2)}\n\nReady for collection / delivery! Thank you so much 🧁💛\n\n- Maggie's Treat`;
+  let phone=(o.phone||'').replace(/\D/g,''); if(phone.startsWith('0')) phone='27'+phone.substring(1);
+  window.open(`https://wa.me/${phone}?text=${encodeURIComponent(msg)}`,'_blank');
   load();
 };
-
-$('exportBtn').onclick=()=>{
-  const csv=['Date,Customer,Phone,Total,Status',...orders.map(o=>`"${new Date(o.created_at).toLocaleString()}", "${o.customer_name}", "${o.phone||''}", ${o.total}, ${o.status}`)].join('\n');
-  const blob=new Blob([csv],{type:'text/csv'}); const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download=`maggies-orders-${new Date().toISOString().slice(0,10)}.csv`; a.click();
-};
+$('exportBtn').onclick=()=>{const csv=['Date,Customer,Phone,Total,Status',...orders.map(o=>`"${new Date(o.created_at).toLocaleString()}", "${o.customer_name}", "${o.phone||''}", ${o.total}, ${o.status}`)].join('\n'); const blob=new Blob([csv],{type:'text/csv'}); const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download=`maggies-${new Date().toISOString().slice(0,10)}.csv`; a.click();};
+document.querySelectorAll('.tab').forEach(t=>t.onclick=()=>{document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active')); t.classList.add('active'); const v=t.dataset.tab; $('filter').value=v==='all'?'all':v; render();});
 
 (async()=>{ const {data:{session}}=await db.auth.getSession(); if(session) openDash(); })();
 </script>
