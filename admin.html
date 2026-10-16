@@ -1,88 +1,219 @@
 <!doctype html>
 <html lang="en-ZA">
 <head>
-<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Admin | Maggie's Treat</title>
-<link rel="stylesheet" href="styles.css">
+<meta charset="utf-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Maggie's Treat — Business OS</title>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.7/dist/umd/supabase.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
 <style>
-body{display:block!important;background:#f7f1e8;min-height:100vh}
+:root{--orange:#ff7900;--bg:#fbf6ee;--card:#fff;--text:#121212;--muted:#8a7f72;--border:#f0e6d8}
+*{box-sizing:border-box;font-family:'Plus Jakarta Sans',sans-serif}
+body{margin:0;background:var(--bg);color:var(--text);display:flex;min-height:100vh}
 .hidden{display:none!important}
-.login-panel{max-width:480px;margin:40px auto;background:#fff;padding:32px;border-radius:24px;box-shadow:0 8px 30px rgba(0,0,0,.08)}
-.login-panel input{width:100%;padding:14px;border-radius:12px;border:1px solid #ddd;margin:8px 0 16px}
-.button{width:100%;padding:14px;border-radius:999px;background:#ff7900;color:#fff;border:0;font-weight:700;cursor:pointer}
-.error{color:#b00;background:#ffe6e6;padding:12px;border-radius:8px;margin:10px 0}
-.order-card,.stat-card{background:#fff;padding:16px;margin:10px 0;border-radius:16px;box-shadow:0 2px 10px rgba(0,0,0,.05)}
-.order-items{list-style:none;padding:0}
-.order-items li{display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px dashed #eee}
+#loginWrap{width:100%;display:flex;align-items:center;justify-content:center;min-height:100vh;background:radial-gradient(1200px 600px at 10% -10%,#ffecd2,transparent),radial-gradient(800px 500px at 100% 0,#ffe0b8,var(--bg))}
+.login-card{width:100%;max-width:420px;background:var(--card);padding:36px;border-radius:28px;box-shadow:0 20px 60px rgba(0,0,0,.08);border:1px solid var(--border)}
+.login-card h1{margin:0 0 6px;font-size:28px;font-weight:800}.login-card p{color:var(--muted);margin:0 0 24px}
+.login-card input{width:100%;padding:14px 16px;border-radius:14px;border:1.5px solid var(--border);margin:8px 0 16px;font-size:15px}
+.btn{border:0;background:var(--orange);color:#fff;padding:14px 18px;border-radius:999px;font-weight:800;cursor:pointer;transition:.2s}
+.btn:hover{transform:translateY(-1px);box-shadow:0 8px 20px rgba(255,121,0,.3)}
+.btn-ghost{background:#fff;color:#121212;border:1.5px solid var(--border)}
+/* Sidebar */
+aside{width:280px;background:#111;color:#fff;padding:24px 18px;position:sticky;top:0;height:100vh;display:flex;flex-direction:column;gap:8px}
+aside.logo{font-weight:800;font-size:18px;letter-spacing:-.5px;margin-bottom:18px;display:flex;align-items:center;gap:10px}
+aside.logo span{background:var(--orange);width:36px;height:36px;border-radius:10px;display:grid;place-items:center}
+.nav-btn{width:100%;text-align:left;padding:12px 14px;border-radius:12px;border:0;background:transparent;color:#bbb;font-weight:600;cursor:pointer;display:flex;gap:10px;align-items:center}
+.nav-btn.active{background:#1f1f1f;color:#fff}
+main{flex:1;padding:28px;max-width:1400px}
+.topbar{display:flex;justify-content:space-between;align-items:center;margin-bottom:22px;gap:12px;flex-wrap:wrap}
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:14px;margin-bottom:20px}
+.kpi{background:var(--card);border:1px solid var(--border);border-radius:20px;padding:18px}
+.kpi small{color:var(--muted);font-weight:700;letter-spacing:.5px;text-transform:uppercase;font-size:11px}
+.kpi h2{margin:8px 0 0;font-size:26px}
+.kpi.trend{font-size:12px;margin-top:6px;color:#1a9c5a}
+.grid2{display:grid;grid-template-columns:1.3fr.7fr;gap:14px}
+@media(max-width:1000px){.grid2{grid-template-columns:1fr} aside{width:80px} aside.label{display:none}}
+.card{background:var(--card);border:1px solid var(--border);border-radius:20px;padding:18px}
+.card h3{margin:0 0 12px;font-size:16px}
+.table{width:100%;border-collapse:collapse}
+.table th{font-size:11px;text-transform:uppercase;letter-spacing:.6px;color:var(--muted);text-align:left;padding:10px 8px;border-bottom:1px solid var(--border)}
+.table td{padding:12px 8px;border-bottom:1px solid #f7efe4;font-size:14px}
+.badge{padding:4px 10px;border-radius:999px;font-size:11px;font-weight:800;text-transform:uppercase}
+.b-new{background:#fff1e0;color:#b65d00}.b-preparing{background:#e8f0ff;color:#2d5bd1}.b-ready{background:#e6f9ed;color:#0a7a2e}.b-completed{background:#f0f0f0;color:#555}.b-cancelled{background:#ffe2e2;color:#a00}
+input,select,textarea{padding:10px 12px;border-radius:12px;border:1.5px solid var(--border);font-size:14px}
+@media(max-width:700px){body{flex-direction:column} aside{width:100%;height:auto;flex-direction:row;overflow:auto} main{padding:16px}}
 </style>
 </head>
 <body>
-<header style="padding:16px;display:flex;justify-content:space-between;background:#fff"><a href="index.html"><strong>MAGGIE'S TREAT</strong></a><div><button id="logoutBtn" class="hidden" style="padding:8px 16px;border-radius:999px;border:1px solid #ddd;background:#fff">Log out</button></div></header>
-<main style="padding:20px;max-width:1200px;margin:0 auto">
-<div id="loginPanel" class="login-panel">
-<h2>Welcome back.</h2>
-<div id="loginMessage"></div>
-<form id="loginForm">
-<label>Admin email</label><input id="loginEmail" type="email" value="plethabo434@gmail.com" required>
-<label>Password</label><input id="loginPassword" type="password" required>
-<button class="button" type="submit">Sign in to dashboard →</button>
-</form>
+<div id="loginWrap">
+<div class="login-card">
+<h1>Maggie's Treat OS</h1><p>Business dashboard — admin only</p>
+<div id="loginMsg"></div>
+<input id="email" type="email" value="plethabo434@gmail.com" placeholder="Admin email"/>
+<input id="pass" type="password" placeholder="Password"/>
+<button class="btn" style="width:100%" id="loginBtn">Sign in →</button>
+<small style="display:block;margin-top:14px;color:var(--muted)">Supabase project: texzgslhswsyooixscmz</small>
+</div></div>
+
+<aside id="sidebar" class="hidden">
+<div class="logo"><span>🧁</span><div class="label">MAGGIE'S TREAT</div></div>
+<button class="nav-btn active" data-tab="dash">📊 <span class="label">Dashboard</span></button>
+<button class="nav-btn" data-tab="orders">🧾 <span class="label">Orders</span></button>
+<button class="nav-btn" data-tab="menu">🍰 <span class="label">Menu & Stock</span></button>
+<button class="nav-btn" data-tab="customers">👥 <span class="label">Customers</span></button>
+<button class="nav-btn" data-tab="marketing">🏷️ <span class="label">Marketing</span></button>
+<button class="nav-btn" data-tab="settings">⚙️ <span class="label">Settings</span></button>
+<div style="margin-top:auto;display:flex;flex-direction:column;gap:8px">
+<button id="exportBtn" class="nav-btn">📤 <span class="label">Export CSV</span></button>
+<button id="logoutBtn" class="nav-btn">🚪 <span class="label">Log out</span></button>
 </div>
-<div id="dashboardPanel" class="hidden">
-<div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;margin-bottom:20px">
-<h1>Store dashboard</h1><button id="refreshBtn" style="padding:10px 18px;border-radius:999px;border:0;background:#111;color:#fff">Refresh</button>
+</aside>
+
+<main id="main" class="hidden">
+<div class="topbar"><h1 id="tabTitle" style="margin:0">Dashboard</h1><div style="display:flex;gap:8px"><span id="liveDot" style="background:#1a9c5a;color:#fff;padding:6px 12px;border-radius:999px;font-size:12px;font-weight:700">● LIVE</span><button class="btn-ghost btn" id="refresh">Refresh</button></div></div>
+
+<!-- DASH -->
+<section id="tab-dash">
+<div class="kpis" id="kpis"></div>
+<div class="grid2">
+<div class="card"><h3>Revenue (Last 7 days)</h3><canvas id="revChart" height="120"></canvas></div>
+<div class="card"><h3>Quick actions</h3><div style="display:flex;flex-direction:column;gap:8px"><button class="btn" onclick="switchTab('orders')">View new orders →</button><button class="btn-ghost btn" onclick="switchTab('menu')">Add new product</button><div id="alerts" style="margin-top:8px"></div></div></div>
 </div>
-<div id="stats" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px"></div>
-<h2 style="margin-top:24px">Orders</h2>
-<select id="filter" style="padding:8px 12px;border-radius:999px"><option value="all">All</option><option value="new">New</option><option value="preparing">Preparing</option><option value="ready">Ready</option><option value="completed">Completed</option><option value="cancelled">Cancelled</option></select>
-<div id="ordersList" style="margin-top:12px"></div>
+<div class="grid2" style="margin-top:14px">
+<div class="card"><h3>Top products today</h3><div id="topProducts"></div></div>
+<div class="card"><h3>Hourly sales</h3><canvas id="hourChart" height="120"></canvas></div>
 </div>
+</section>
+
+<!-- ORDERS -->
+<section id="tab-orders" class="hidden">
+<div class="card"><div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px"><input id="searchOrder" placeholder="Search customer / phone"/><select id="statusFilter"><option value="all">All status</option><option value="new">New</option><option value="preparing">Preparing</option><option value="ready">Ready</option><option value="completed">Completed</option><option value="cancelled">Cancelled</option></select><select id="sortOrder"><option value="newest">Newest first</option><option value="total">Highest total</option></select></div><div style="overflow:auto"><table class="table"><thead><tr><th>Time</th><th>Customer</th><th>Items</th><th>Total</th><th>Status</th><th>Action</th></tr></thead><tbody id="ordersBody"></tbody></table></div></div>
+</section>
+
+<!-- MENU -->
+<section id="tab-menu" class="hidden">
+<div class="grid2"><div class="card"><h3>Add / Edit product</h3><input id="pName" placeholder="Name (e.g., Red Velvet)"/><input id="pCat" placeholder="Category (Cakes, Bites, etc)"/><div style="display:grid;grid-template-columns:1fr 1fr;gap:8px"><input id="pPrice" type="number" placeholder="Price R"/><input id="pCost" type="number" placeholder="Cost R (profit calc)"/><input id="pStock" type="number" placeholder="Stock qty"/></div><input id="pImage" placeholder="Image URL"/><textarea id="pDesc" placeholder="Description" style="width:100%;height:70px;margin-top:8px"></textarea><label style="display:flex;gap:8px;align-items:center;margin:10px 0"><input type="checkbox" id="pAvail" checked/> Available</label><button class="btn" id="saveProduct">Save product</button><div id="prodMsg" style="margin-top:8px"></div></div><div class="card"><h3>Menu</h3><div id="productsList"></div></div></div>
+</section>
+
+<!-- CUSTOMERS -->
+<section id="tab-customers" class="hidden"><div class="card"><h3>Customers</h3><table class="table"><thead><tr><th>Name</th><th>Phone</th><th>Orders</th><th>Spent</th><th>Last</th><th>WhatsApp</th></tr></thead><tbody id="customersBody"></tbody></table></div></section>
+
+<!-- MARKETING -->
+<section id="tab-marketing" class="hidden"><div class="grid2"><div class="card"><h3>Create promo code</h3><input id="promoCode" placeholder="e.g., MAGGIE10"/><input id="promoPct" type="number" placeholder="Discount %"/><button class="btn" id="savePromo">Create code</button><div id="promoList" style="margin-top:12px"></div></div><div class="card"><h3>What to send</h3><p style="color:var(--muted)">Best promo text for WhatsApp Status: <br/><br/><b id="promoText">🔥 MAGGIE'S TREAT: Use code MAGGIE10 for 10% OFF today only! Order: erealstoterr.github.io</b></p></div></div></section>
+
+<!-- SETTINGS -->
+<section id="tab-settings" class="hidden"><div class="card"><h3>Store control</h3><label style="display:flex;gap:10px;align-items:center;margin:12px 0"><input type="checkbox" id="storeOpen" checked/> Store is OPEN for orders</label><div style="display:grid;grid-template-columns:1fr 1fr;gap:10px"><input id="deliveryFee" type="number" placeholder="Delivery fee R"/><input id="minOrder" type="number" placeholder="Min order R"/></div><textarea id="announcement" placeholder="Announcement banner (e.g., Closed on Sundays)" style="width:100%;height:80px;margin-top:10px"></textarea><button class="btn" id="saveSettings">Save settings</button><div id="settingsMsg" style="margin-top:10px"></div></div></section>
+
 </main>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.7/dist/umd/supabase.min.js"></script>
+
 <script>
-const SUPABASE_URL='https://texzgslhswsyooixscmz.supabase.co';
-const SUPABASE_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRleHpnc2xoc3dzeW9vaXhzY216Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTIxMDE2NDEsImV4cCI6MjEwNzY3NzY0MX0.Ui612PvVsw3jpT_WnR3U4ve8zNpYfcdHSd7KfuKv9U8';
-const db=supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
+const URL='https://texzgslhswsyooixscmz.supabase.co';
+const KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRleHpnc2xoc3dzeW9vaXhzY216Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTIxMDE2NDEsImV4cCI6MjEwNzY3NzY0MX0.Ui612PvVsw3jpT_WnR3U4ve8zNpYfcdHSd7KfuKv9U8';
+const db=supabase.createClient(URL,KEY);
 const $=id=>document.getElementById(id);
-let orders=[];
-$('loginForm').onsubmit=async(e)=>{
-  e.preventDefault();
-  $('loginMessage').textContent='Signing in…';
-  const email=$('loginEmail').value.trim().toLowerCase();
-  const password=$('loginPassword').value;
-  const {data,error}=await db.auth.signInWithPassword({email,password});
-  if(error){ $('loginMessage').innerHTML='<div class=error>'+error.message+'</div>'; return; }
-  openDash();
+let orders=[],products=[],settings={},charts={};
+
+$('loginBtn').onclick=async()=>{
+  const email=$('email').value.trim().toLowerCase(); const password=$('pass').value;
+  $('loginMsg').textContent='Signing in...';
+  const {error}=await db.auth.signInWithPassword({email,password});
+  if(error){$('loginMsg').innerHTML='<div style="background:#ffe2e2;padding:10px;border-radius:10px;color:#a00">'+error.message+'</div>'; return;}
+  boot();
 };
-$('logoutBtn').onclick=async()=>{ await db.auth.signOut(); location.reload(); };
-$('refreshBtn').onclick=load;
-$('filter').onchange=render;
-async function openDash(){ $('loginPanel').classList.add('hidden'); $('dashboardPanel').classList.remove('hidden'); $('logoutBtn').classList.remove('hidden'); await load(); }
-async function load(){
-  $('ordersList').innerHTML='Loading…';
-  try{
-    const {data:ordersData,error:oErr}=await db.from('orders').select('*').order('created_at',{ascending:false}).limit(100);
-    if(oErr) throw oErr;
-    orders=ordersData;
-    let revToday=0, revWeek=0, revMonth=0, todayCount=0;
-    const now=new Date(); const startToday=new Date(now.getFullYear(),now.getMonth(),now.getDate());
-    const startWeek=new Date(now); startWeek.setDate(now.getDate()-7);
-    const startMonth=new Date(now.getFullYear(),now.getMonth(),1);
-    orders.forEach(o=>{ const d=new Date(o.created_at); const tot=Number(o.total||0); if(d>=startToday){revToday+=tot; todayCount++} if(d>=startWeek) revWeek+=tot; if(d>=startMonth) revMonth+=tot; });
-    $('stats').innerHTML=`<div class=stat-card><small>Revenue Today</small><h2>R ${revToday.toFixed(2)}</h2></div><div class=stat-card><small>Revenue Week</small><h2>R ${revWeek.toFixed(2)}</h2></div><div class=stat-card><small>Revenue Month</small><h2>R ${revMonth.toFixed(2)}</h2></div><div class=stat-card><small>Orders Today</small><h2>${todayCount}</h2></div>`;
-    render();
-  }catch(err){ $('ordersList').innerHTML='<div class=error>'+err.message+'</div>'; }
+$('logoutBtn').onclick=async()=>{await db.auth.signOut(); location.reload();};
+$('refresh').onclick=boot;
+
+function switchTab(name){
+  document.querySelectorAll('[id^=tab-]').forEach(s=>s.classList.add('hidden'));
+  $(`tab-${name}`).classList.remove('hidden');
+  document.querySelectorAll('.nav-btn[data-tab]').forEach(b=>b.classList.toggle('active',b.dataset.tab===name));
+  $('tabTitle').textContent=name.charAt(0).toUpperCase()+name.slice(1);
 }
-function render(){
-  const f=$('filter').value; let list=f==='all'?orders:orders.filter(o=>o.status===f);
-  if(!list.length){ $('ordersList').innerHTML='<p>No orders.</p>'; return; }
-  $('ordersList').innerHTML=list.map(o=>{
-    const items=Array.isArray(o.item_details)?o.item_details.map(i=>`<li><span>${i.quantity}× ${i.name}</span><span>R${(i.line_total||i.price*i.quantity).toFixed(2)}</span></li>`).join(''):'';
-    return `<div class=order-card><div style="display:flex;justify-content:space-between"><b>${o.customer_name}</b><b>R${Number(o.total).toFixed(2)}</b></div><small>${new Date(o.created_at).toLocaleString('en-ZA')}</small><ul class=order-items>${items}</ul><small>${o.phone||''}</small><div style="margin-top:8px"><select onchange="updateStatus('${o.id}',this.value)"><option value="new" ${o.status==='new'?'selected':''}>New</option><option value="preparing" ${o.status==='preparing'?'selected':''}>Preparing</option><option value="ready" ${o.status==='ready'?'selected':''}>Ready</option><option value="completed" ${o.status==='completed'?'selected':''}>Completed</option><option value="cancelled" ${o.status==='cancelled'?'selected':''}>Cancelled</option></select></div></div>`;
-  }).join('');
+document.querySelectorAll('.nav-btn[data-tab]').forEach(b=>b.onclick=()=>switchTab(b.dataset.tab));
+
+async function boot(){
+  const {data:{session}}=await db.auth.getSession(); if(!session){$('loginWrap').classList.remove('hidden'); return;}
+  $('loginWrap').classList.add('hidden'); $('sidebar').classList.remove('hidden'); $('main').classList.remove('hidden');
+  await loadAll();
+  db.channel('orders-live').on('postgres_changes',{event:'*',schema:'public',table:'orders'},()=>{loadAll(); $('liveDot').textContent='● NEW ORDER!'; setTimeout(()=>$('liveDot').textContent='● LIVE',3000)}).subscribe();
 }
-window.updateStatus=async(id,status)=>{ await db.from('orders').update({status}).eq('id',id); load(); };
-(async()=>{ const {data:{session}}=await db.auth.getSession(); if(session) openDash(); })();
+async function loadAll(){
+  const [o,p,s]=await Promise.all([
+    db.from('orders').select('*').order('created_at',{ascending:false}).limit(200),
+    db.from('products').select('*').order('created_at',{ascending:false}),
+    db.from('store_settings').select('*').eq('id',1).maybeSingle()
+  ]);
+  orders=o.data||[]; products=p.data||[]; settings=s.data||{};
+  renderKPI(); renderOrders(); renderProducts(); renderCustomers(); renderSettings(); renderCharts();
+}
+function renderKPI(){
+  const now=new Date(); const today=new Date(now.getFullYear(),now.getMonth(),now.getDate());
+  const week=new Date(); week.setDate(now.getDate()-7);
+  const month=new Date(now.getFullYear(),now.getMonth(),1);
+  let revToday=0, revWeek=0, revMonth=0, todayCount=0, aov=0;
+  orders.forEach(o=>{const d=new Date(o.created_at); const t=Number(o.total||0); if(d>=today){revToday+=t; todayCount++;} if(d>=week) revWeek+=t; if(d>=month) revMonth+=t;});
+  aov=todayCount?revToday/todayCount:0;
+  $('kpis').innerHTML=`
+  <div class="kpi"><small>Revenue Today</small><h2>R ${revToday.toFixed(2)}</h2><div class="trend">+ ${todayCount} orders</div></div>
+  <div class="kpi"><small>Revenue Week</small><h2>R ${revWeek.toFixed(2)}</h2></div>
+  <div class="kpi"><small>Revenue Month</small><h2>R ${revMonth.toFixed(2)}</h2></div>
+  <div class="kpi"><small>Avg Order Today</small><h2>R ${aov.toFixed(2)}</h2></div>`;
+  const low=products.filter(p=>p.stock<10);
+  $('alerts').innerHTML=low.length?`<div style="background:#fff1e0;padding:10px;border-radius:12px;font-size:13px">⚠️ Low stock: ${low.map(l=>l.name).join(', ')}</div>`:`<div style="color:var(--muted);font-size:13px">✓ Stock levels OK</div>`;
+}
+function renderCharts(){
+  const days=[...Array(7)].map((_,i)=>{const d=new Date(); d.setDate(d.getDate()-6+i); return d;});
+  const revByDay=days.map(d=>{const s=new Date(d.getFullYear(),d.getMonth(),d.getDate()); const e=new Date(s); e.setDate(s.getDate()+1); let sum=0; orders.forEach(o=>{const od=new Date(o.created_at); if(od>=s&&od<e) sum+=Number(o.total||0)}); return sum;});
+  if(charts.rev) charts.rev.destroy();
+  charts.rev=new Chart($('revChart'),{type:'bar',data:{labels:days.map(d=>d.toLocaleDateString('en-ZA',{weekday:'short'})),datasets:[{label:'R',data:revByDay,backgroundColor:'#ff7900',borderRadius:8}]},options:{plugins:{legend:{display:false}},scales:{y:{beginAtZero:true}}}});
+  const hours=Array(24).fill(0); orders.forEach(o=>{const h=new Date(o.created_at).getHours(); hours[h]+=Number(o.total||0);});
+  if(charts.hour) charts.hour.destroy();
+  charts.hour=new Chart($('hourChart'),{type:'line',data:{labels:hours.map((_,i)=>i+':00'),datasets:[{data:hours,borderColor:'#111',tension:.4,fill:false}]},options:{plugins:{legend:{display:false}}}});
+  const top={}; orders.forEach(o=>{(o.item_details||[]).forEach(it=>{top[it.name]=(top[it.name]||0)+it.quantity;});});
+  $('topProducts').innerHTML=Object.entries(top).sort((a,b)=>b[1]-a[1]).slice(0,5).map(([n,q])=>`<div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px dashed #eee"><span>${n}</span><b>${q} sold</b></div>`).join('')||'<small style="color:var(--muted)">No sales yet</small>';
+}
+function renderOrders(){
+  const q=$('searchOrder').value.toLowerCase(); const f=$('statusFilter').value; const sort=$('sortOrder').value;
+  let list=orders.filter(o=>{const okStatus=f==='all'||o.status===f; const okQ=!q||`${o.customer_name} ${o.phone}`.toLowerCase().includes(q); return okStatus&&okQ;});
+  if(sort==='total') list=list.slice().sort((a,b)=>b.total-a.total);
+  $('ordersBody').innerHTML=list.map(o=>{
+    const items=(o.item_details||[]).map(i=>`${i.quantity}× ${i.name}`).join(', ');
+    const phone=(o.phone||'').replace(/\D/g,'');
+    return `<tr><td><small>${new Date(o.created_at).toLocaleString('en-ZA')}</small></td><td><b>${o.customer_name}</b><br/><small>${o.phone||''}</small></td><td style="max-width:220px"><small>${items}</small></td><td><b>R${Number(o.total).toFixed(2)}</b></td><td><span class="badge b-${o.status}">${o.status}</span></td><td><select onchange="updateStatus('${o.id}',this.value)" style="padding:6px"><option value="new" ${o.status==='new'?'selected':''}>New</option><option value="preparing" ${o.status==='preparing'?'selected':''}>Preparing</option><option value="ready" ${o.status==='ready'?'selected':''}>Ready</option><option value="completed" ${o.status==='completed'?'selected':''}>Completed</option><option value="cancelled" ${o.status==='cancelled'?'selected':''}>Cancelled</option></select> <a href="https://wa.me/${phone}?text=Hi ${encodeURIComponent(o.customer_name)}, your order from Maggie's Treat is ${o.status}! Total: R${o.total}" target="_blank" style="text-decoration:none">📱</a> <button onclick="printOrder('${o.id}')" style="border:0;background:#f5eee4;padding:6px 8px;border-radius:8px">🖨️</button></td></tr>`;
+  }).join('')||'<tr><td colspan=6 style="text-align:center;color:var(--muted)">No orders</td></tr>';
+}
+window.updateStatus=async(id,status)=>{await db.from('orders').update({status}).eq('id',id); loadAll();};
+window.printOrder=(id)=>{const o=orders.find(x=>x.id===id); if(!o) return; const w=window.open('','_blank'); w.document.write(`<pre>MAGGIE'S TREAT\n${new Date(o.created_at).toLocaleString()}\nCustomer: ${o.customer_name}\nPhone: ${o.phone}\n\n${(o.item_details||[]).map(i=>`${i.quantity} x ${i.name} - R${i.line_total}`).join('\n')}\n\nTOTAL: R${o.total}\nStatus: ${o.status}</pre>`); w.print();};
+$('searchOrder').oninput=renderOrders; $('statusFilter').onchange=renderOrders; $('sortOrder').onchange=renderOrders;
+
+function renderProducts(){
+  $('productsList').innerHTML=products.map(p=>`<div style="display:flex;gap:12px;align-items:center;padding:10px;border-bottom:1px solid #f0e6d8"><img src="${p.image_url||'https://via.placeholder.com/60'}" style="width:54px;height:54px;object-fit:cover;border-radius:12px"/><div style="flex:1"><b>${p.name}</b> <small style="color:var(--muted)">• ${p.category}</small><br/><small>R${p.price} • stock ${p.stock} ${p.is_available?'• ✅':'• ❌'}</small></div><button onclick="editProd('${p.id}')" style="border:0;background:#f5eee4;padding:8px 10px;border-radius:10px">Edit</button><button onclick="delProd('${p.id}')" style="border:0;background:#ffe2e2;padding:8px 10px;border-radius:10px">Del</button></div>`).join('')||'<small>No products yet</small>';
+}
+let editingId=null;
+$('saveProduct').onclick=async()=>{
+  const payload={name:$('pName').value,category:$('pCat').value,price:Number($('pPrice').value),cost:Number($('pCost').value||0),stock:Number($('pStock').value||0),image_url:$('pImage').value,description:$('pDesc').value,is_available:$('pAvail').checked};
+  if(!payload.name||!payload.price){$('prodMsg').textContent='Name & price required'; return;}
+  let res; if(editingId) res=await db.from('products').update(payload).eq('id',editingId); else res=await db.from('products').insert(payload);
+  if(res.error) $('prodMsg').textContent=res.error.message; else { $('prodMsg').textContent='Saved ✓'; ['pName','pCat','pPrice','pCost','pStock','pImage','pDesc'].forEach(id=>$(id).value=''); editingId=null; loadAll(); }
+};
+window.editProd=(id)=>{const p=products.find(x=>x.id===id); if(!p) return; $('pName').value=p.name; $('pCat').value=p.category; $('pPrice').value=p.price; $('pCost').value=p.cost; $('pStock').value=p.stock; $('pImage').value=p.image_url; $('pDesc').value=p.description; $('pAvail').checked=p.is_available; editingId=id; switchTab('menu'); window.scrollTo(0,0);};
+window.delProd=async(id)=>{if(!confirm('Delete?')) return; await db.from('products').delete().eq('id',id); loadAll();};
+
+function renderCustomers(){
+  const map={}; orders.forEach(o=>{const k=o.phone||o.customer_name; if(!map[k]) map[k]={name:o.customer_name,phone:o.phone,orders:0,spent:0,last:0}; map[k].orders++; map[k].spent+=Number(o.total||0); map[k].last=Math.max(map[k].last,new Date(o.created_at).getTime());});
+  const list=Object.values(map).sort((a,b)=>b.spent-a.spent);
+  $('customersBody').innerHTML=list.map(c=>`<tr><td><b>${c.name}</b></td><td>${c.phone||''}</td><td>${c.orders}</td><td><b>R${c.spent.toFixed(2)}</b></td><td><small>${new Date(c.last).toLocaleDateString()}</small></td><td><a href="https://wa.me/${(c.phone||'').replace(/\D/g,'')}" target="_blank">📱 WhatsApp</a></td></tr>`).join('')||'<tr><td colspan=6>No customers</td></tr>';
+}
+$('savePromo').onclick=async()=>{const code=$('promoCode').value.trim().toUpperCase(); const pct=Number($('promoPct').value); if(!code||!pct) return; const {error}=await db.from('promos').insert({code,discount_percent:pct}); if(error) alert(error.message); else {$('promoCode').value=''; $('promoPct').value=''; loadPromos();}};
+async function loadPromos(){const {data}=await db.from('promos').select('*').order('created_at',{ascending:false}); $('promoList').innerHTML=(data||[]).map(p=>`<div style="display:flex;justify-content:space-between;padding:8px;background:#fbf6ee;border-radius:10px;margin:6px 0"><span><b>${p.code}</b> - ${p.discount_percent}%</span><small>${p.active?'Active':'Off'}</small></div>`).join('');}
+loadPromos();
+
+function renderSettings(){if(!settings) return; $('storeOpen').checked=settings.is_open??true; $('deliveryFee').value=settings.delivery_fee??0; $('minOrder').value=settings.min_order??0; $('announcement').value=settings.announcement||'';}
+$('saveSettings').onclick=async()=>{const payload={id:1,is_open:$('storeOpen').checked,delivery_fee:Number($('deliveryFee').value),min_order:Number($('minOrder').value),announcement:$('announcement').value}; const {error}=await db.from('store_settings').upsert(payload); $('settingsMsg').textContent=error?error.message:'Saved ✓ — your site will read this setting';};
+
+$('exportBtn').onclick=()=>{const csv=['Date,Customer,Phone,Items,Total,Status',...orders.map(o=>`"${new Date(o.created_at).toLocaleString()}", "${o.customer_name}", "${o.phone||''}", "${(o.item_details||[]).map(i=>`${i.quantity}x ${i.name}`).join('; ')}", ${o.total}, ${o.status}`)].join('\n'); const blob=new Blob([csv],{type:'text/csv'}); const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download=`maggies-orders-${new Date().toISOString().slice(0,10)}.csv`; a.click();};
+
+(async()=>{const {data:{session}}=await db.auth.getSession(); if(session) boot(); else {$('loginWrap').classList.remove('hidden');}})();
 </script>
 </body>
-</html>
+  </html>
