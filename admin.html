@@ -4,58 +4,56 @@
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Admin | Maggie's Treat</title>
 <link rel="stylesheet" href="styles.css">
-<style>body{display:block!important}.admin-body{background:#f7f1e8;min-height:100vh}.login-panel{max-width:480px;margin:40px auto;background:#fff;padding:32px;border-radius:24px;box-shadow:0 8px 30px rgba(0,0,0,.08)}.login-panel input{width:100%;padding:14px;border-radius:12px;border:1px solid #ddd;margin:8px 0 16px}.button{width:100%;padding:14px;border-radius:999px;background:#ff7900;color:#fff;border:0;font-weight:700}</style>
+<style>body{display:block!important}.admin-body{background:#f7f1e8;min-height:100vh}.login-panel{max-width:480px;margin:40px auto;background:#fff;padding:32px;border-radius:24px;box-shadow:0 8px 30px rgba(0,0,0,.08)}.login-panel input{width:100%;padding:14px;border-radius:12px;border:1px solid #ddd;margin:8px 0 16px}.button{width:100%;padding:14px;border-radius:999px;background:#ff7900;color:#fff;border:0;font-weight:700;cursor:pointer}.error{color:#b00;background:#ffe6e6;padding:12px;border-radius:8px;margin:10px 0}</style>
 </head>
 <body class="admin-body">
 <header class="admin-header" style="padding:16px;display:flex;justify-content:space-between"><a class="brand" href="index.html"><strong>MAGGIE'S TREAT</strong></a><a href="index.html">View shop</a></header>
 <main style="padding:20px">
 <div id="loginPanel" class="login-panel">
 <span class="eyebrow">PRIVATE AREA</span><h1>Welcome back.</h1>
-<p id="loginMessage" style="color:#b00"></p>
+<div id="loginMessage"></div>
 <form id="loginForm" autocomplete="off">
 <label>Admin email</label>
-<input id="loginEmail" type="text" autocomplete="off" placeholder="plethabo434@gmail.com" value="plethabo434@gmail.com">
+<input id="loginEmail" type="text" value="plethabo434@gmail.com">
 <label>Password</label>
 <input id="loginPassword" type="password" placeholder="Your password" required>
 <button class="button" type="submit">Sign in to dashboard →</button>
 </form>
 </div>
 <div id="dashboardPanel" style="display:none;max-width:1100px;margin:0 auto">
-<h1>Store dashboard</h1><p id="lastUpdated"></p>
+<h1>Store dashboard</h1>
 <button id="logoutBtn" style="padding:10px 20px">Log out</button>
 <button id="refreshBtn" style="padding:10px 20px">Refresh</button>
-<div id="dashboardMessage"></div>
 <div id="ordersList" style="margin-top:20px"></div>
-<div id="reviewsList" style="margin-top:20px"></div>
 </div>
 </main>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.7/dist/umd/supabase.min.js"></script>
 <script>
 const SUPABASE_URL='https://texzgslhswsyooixscmz.supabase.co';
-const SUPABASE_KEY='sb_publishable_aVVNNntwsS4oqDdQNzIlEw_gEsUTf6O';
-const supabase=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
+// PASTE YOUR ANON KEY HERE:
+const SUPABASE_KEY='REPLACE_WITH_YOUR_ANON_EYJ_KEY_HERE';
+const supabaseClient=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
 const $=id=>document.getElementById(id);
 const loginPanel=$('loginPanel'), dashboardPanel=$('dashboardPanel'), loginMessage=$('loginMessage');
-async function checkSession(){
- const {data:{session}}=await supabase.auth.getSession();
- if(session){ loginPanel.style.display='none'; dashboardPanel.style.display='block'; loadOrders(); }
-}
 $('loginForm').addEventListener('submit', async (e)=>{
  e.preventDefault();
- loginMessage.textContent='Signing in...';
+ loginMessage.innerHTML='Signing in...';
  const email=$('loginEmail').value.trim(); const password=$('loginPassword').value;
- const {data,error}=await supabase.auth.signInWithPassword({email,password});
- if(error){ loginMessage.textContent=error.message; return; }
+ if(SUPABASE_KEY.includes('REPLACE')){ loginMessage.innerHTML='<div class=error>Fix: paste your anon eyJ key in code first</div>'; return; }
+ const {data,error}=await supabaseClient.auth.signInWithPassword({email,password});
+ if(error){ loginMessage.innerHTML='<div class=error>FAILED: '+error.message+'</div>'; return; }
  loginPanel.style.display='none'; dashboardPanel.style.display='block'; loadOrders();
 });
-$('logoutBtn').addEventListener('click', async()=>{ await supabase.auth.signOut(); loginPanel.style.display='block'; dashboardPanel.style.display='none'; });
+$('logoutBtn').addEventListener('click', async()=>{ await supabaseClient.auth.signOut(); location.reload(); });
+$('refreshBtn').addEventListener('click', loadOrders);
 async function loadOrders(){
- const {data,error}=await supabase.from('orders').select('*').order('created_at',{ascending:false}).limit(50);
+ const {data,error}=await supabaseClient.from('orders').select('*').order('created_at',{ascending:false}).limit(50);
  const list=$('ordersList');
- if(error){ list.innerHTML='<p>Error: '+error.message+'<br>Run SQL setup in Supabase.</p>'; return; }
+ if(error){ list.innerHTML='<p>Error: '+error.message+'</p>'; return; }
  if(!data||!data.length){ list.innerHTML='<p>No orders yet.</p>'; return; }
- list.innerHTML=data.map(o=>'<div style="background:#fff;padding:16px;margin:8px 0;border-radius:12px"><b>'+(o.customer_name||'')+'</b> - R'+(o.total||0)+' - '+(o.status||'')+'<br><small>'+(o.created_at||'')+'</small></div>').join('');
+ list.innerHTML=data.map(o=>'<div style="background:#fff;padding:16px;margin:8px 0;border-radius:12px"><b>'+(o.customer_name||'')+'</b> - R'+(o.total||0)+'<br><small>'+(o.created_at||'')+'</small></div>').join('');
 }
+async function checkSession(){ const {data:{session}}=await supabaseClient.auth.getSession(); if(session){ loginPanel.style.display='none'; dashboardPanel.style.display='block'; loadOrders(); } }
 checkSession();
 </script>
 </body>
