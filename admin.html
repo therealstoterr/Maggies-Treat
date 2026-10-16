@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="en-ZA">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Maggie's Treat Admin</title>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@600;800&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.7/dist/umd/supabase.min.js"></script>
+<style>
+*{box-sizing:border-box;font-family:'Plus Jakarta Sans',sans-serif}
+body{margin:0;background:#fbf6ee;min-height:100vh}
+.hidden{display:none!important}
+.wrap{min-height:100vh;display:grid;place-items:center;padding:20px}
+.card{width:100%;max-width:420px;background:#fff;border-radius:26px;padding:30px;box-shadow:0 20px 60px rgba(0,0,0,.08);border:1px solid #f0e6d8}
+.card input{width:100%;padding:15px;border-radius:14px;border:1.5px solid #f0e6d8;margin:8px 0 14px;background:#fdfaf5}
+.btn{width:100%;padding:15px;border-radius:999px;background:#ff7900;color:#fff;border:0;font-weight:800;cursor:pointer}
+.order{background:#fff;border:1px solid #f0e6d8;border-radius:20px;padding:16px;margin:12px 0}
+.btn-done{background:#111;color:#fff;border:0;padding:10px 16px;border-radius:999px;font-weight:800;cursor:pointer}
+</style>
+</head>
+<body>
+
+<div id="loginPanel" class="wrap">
+<div class="card">
+<h2 style="margin:0 0 6px">Welcome back.</h2>
+<p style="color:#8a7f72;font-size:14px;margin:0 0 18px">Sign in to store dashboard</p>
+<div id="msg"></div>
+<form id="loginForm">
+<input id="email" type="email" placeholder="Admin email" required>
+<input id="pass" type="password" placeholder="Password" required>
+<button class="btn" type="submit">Sign in →</button>
+</form>
+</div>
+</div>
+
+<div id="dash" class="hidden">
+<header style="padding:14px 20px;background:#fff;display:flex;justify-content:space-between;border-bottom:1px solid #f0e6d8"><b>MAGGIE'S TREAT</b><button id="out" style="padding:8px 14px;border-radius:999px;border:1px solid #ddd;background:#fff">Log out</button></header>
+<main style="max-width:1000px;margin:0 auto;padding:20px">
+<h1>Store dashboard</h1>
+<div id="list"></div>
+</main>
+</div>
+
+<script>
+const db=supabase.createClient('https://texzgslhswsyooixscmz.supabase.co','eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRleHpnc2xoc3dzeW9vaXhzY216Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTIxMDE2NDEsImV4cCI6MjEwNzY3NzY0MX0.Ui612PvVsw3jpT_WnR3U4ve8zNpYfcdHSd7KfuKv9U8');
+let orders=[];
+document.getElementById('loginForm').onsubmit=async(e)=>{
+  e.preventDefault();
+  document.getElementById('msg').textContent='Signing in...';
+  const {data,error}=await db.auth.signInWithPassword({email:document.getElementById('email').value.trim().toLowerCase(), password:document.getElementById('pass').value});
+  if(error){ document.getElementById('msg').innerHTML='<div style="background:#ffe6e6;padding:10px;border-radius:10px;color:#a00;font-size:13px">'+error.message+'</div>'; return; }
+  document.getElementById('loginPanel').classList.add('hidden');
+  document.getElementById('dash').classList.remove('hidden');
+  load();
+};
+async function load(){
+  const {data}=await db.from('orders').select('*').order('created_at',{ascending:false}).limit(50);
+  orders=data||[];
+  document.getElementById('list').innerHTML=orders.map(o=>`<div class=order><b>${o.customer_name}</b> - R${o.total} - ${o.status}<br><small>${o.phone||''}</small><div style="margin-top:10px">${o.status==='completed'?'<span style="background:#111;color:#fff;padding:8px 12px;border-radius:999px">✓ DONE</span>':`<button class=btn-done onclick="done('${o.id}')">DONE → WhatsApp</button>`}</div></div>`).join('')||'No orders yet';
+}
+window.done=async(id)=>{
+  const o=orders.find(x=>x.id===id);
+  await db.from('orders').update({status:'completed'}).eq('id',id);
+  let phone=(o.phone||'').replace(/\D/g,''); if(phone.startsWith('0')) phone='27'+phone.substring(1);
+  window.open(`https://wa.me/${phone}?text=${encodeURIComponent(`Hi ${o.customer_name}! Your Maggie's Treat order is DONE! R${o.total} ready for collection! 🧁`)}`,'_blank');
+  load();
+};
+document.getElementById('out').onclick=async()=>{await db.auth.signOut(); location.reload();};
+(async()=>{
+  const {data:{session}}=await db.auth.getSession();
+  if(session){ document.getElementById('loginPanel').classList.add('hidden'); document.getElementById('dash').classList.remove('hidden'); load(); }
+})();
+</script>
+</body>
+</html>
