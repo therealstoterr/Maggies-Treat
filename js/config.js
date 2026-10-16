@@ -5,7 +5,7 @@
   NEVER paste a Supabase service_role/secret key into this file.
 */
 window.MT_CONFIG = {
-  supabaseUrl: "PASTE_YOUR_SUPABASE_PROJECT_URL_HERE",
-  supabasePublishableKey: "PASTE_YOUR_SUPABASE_PUBLISHABLE_KEY_HERE",
-  adminEmail: "your-admin-email@example.com"
+  supabaseUrl: "https://therealstoterr.supabase.co",
+  supabasePublishableKey: "eyJ071104668208189621312026",
+  adminEmail: "plethabo434@gmail.com"
 };
