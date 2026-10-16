@@ -18,10 +18,11 @@ body{margin:0;background:var(--bg);color:var(--text);display:flex;min-height:100
 .btn{border:0;background:var(--orange);color:#fff;padding:14px 18px;border-radius:999px;font-weight:800;cursor:pointer;transition:.2s}
 .btn:hover{transform:translateY(-1px);box-shadow:0 8px 20px rgba(255,121,0,.3)}
 .btn-ghost{background:#fff;color:#121212;border:1.5px solid var(--border)}
-/* Sidebar */
+.btn-done{background:#111;color:#fff;border:0;padding:8px 14px;border-radius:999px;font-weight:800;cursor:pointer}
+.btn-done:hover{background:#000;transform:scale(1.02)}
 aside{width:280px;background:#111;color:#fff;padding:24px 18px;position:sticky;top:0;height:100vh;display:flex;flex-direction:column;gap:8px}
-aside.logo{font-weight:800;font-size:18px;letter-spacing:-.5px;margin-bottom:18px;display:flex;align-items:center;gap:10px}
-aside.logo span{background:var(--orange);width:36px;height:36px;border-radius:10px;display:grid;place-items:center}
+.logo{font-weight:800;font-size:18px;letter-spacing:-.5px;margin-bottom:18px;display:flex;align-items:center;gap:10px}
+.logo span{background:var(--orange);width:36px;height:36px;border-radius:10px;display:grid;place-items:center}
 .nav-btn{width:100%;text-align:left;padding:12px 14px;border-radius:12px;border:0;background:transparent;color:#bbb;font-weight:600;cursor:pointer;display:flex;gap:10px;align-items:center}
 .nav-btn.active{background:#1f1f1f;color:#fff}
 main{flex:1;padding:28px;max-width:1400px}
@@ -30,29 +31,28 @@ main{flex:1;padding:28px;max-width:1400px}
 .kpi{background:var(--card);border:1px solid var(--border);border-radius:20px;padding:18px}
 .kpi small{color:var(--muted);font-weight:700;letter-spacing:.5px;text-transform:uppercase;font-size:11px}
 .kpi h2{margin:8px 0 0;font-size:26px}
-.kpi.trend{font-size:12px;margin-top:6px;color:#1a9c5a}
 .grid2{display:grid;grid-template-columns:1.3fr.7fr;gap:14px}
-@media(max-width:1000px){.grid2{grid-template-columns:1fr} aside{width:80px} aside.label{display:none}}
 .card{background:var(--card);border:1px solid var(--border);border-radius:20px;padding:18px}
 .card h3{margin:0 0 12px;font-size:16px}
 .table{width:100%;border-collapse:collapse}
 .table th{font-size:11px;text-transform:uppercase;letter-spacing:.6px;color:var(--muted);text-align:left;padding:10px 8px;border-bottom:1px solid var(--border)}
-.table td{padding:12px 8px;border-bottom:1px solid #f7efe4;font-size:14px}
+.table td{padding:12px 8px;border-bottom:1px solid #f7efe4;font-size:14px;vertical-align:top}
 .badge{padding:4px 10px;border-radius:999px;font-size:11px;font-weight:800;text-transform:uppercase}
-.b-new{background:#fff1e0;color:#b65d00}.b-preparing{background:#e8f0ff;color:#2d5bd1}.b-ready{background:#e6f9ed;color:#0a7a2e}.b-completed{background:#f0f0f0;color:#555}.b-cancelled{background:#ffe2e2;color:#a00}
+.b-new{background:#fff1e0;color:#b65d00}.b-preparing{background:#e8f0ff;color:#2d5bd1}.b-ready{background:#e6f9ed;color:#0a7a2e}.b-completed{background:#e6f9ed;color:#0a7a2e}.b-cancelled{background:#ffe2e2;color:#a00}
 input,select,textarea{padding:10px 12px;border-radius:12px;border:1.5px solid var(--border);font-size:14px}
+@media(max-width:1000px){.grid2{grid-template-columns:1fr} aside{width:80px}.label{display:none}}
 @media(max-width:700px){body{flex-direction:column} aside{width:100%;height:auto;flex-direction:row;overflow:auto} main{padding:16px}}
 </style>
 </head>
 <body>
 <div id="loginWrap">
 <div class="login-card">
-<h1>Maggie's Treat OS</h1><p>Business dashboard — admin only</p>
+<h1>Maggie's Treat OS</h1><p>Admin only — secure login</p>
 <div id="loginMsg"></div>
 <input id="email" type="email" value="plethabo434@gmail.com" placeholder="Admin email"/>
 <input id="pass" type="password" placeholder="Password"/>
 <button class="btn" style="width:100%" id="loginBtn">Sign in →</button>
-<small style="display:block;margin-top:14px;color:var(--muted)">Supabase project: texzgslhswsyooixscmz</small>
+<small style="display:block;margin-top:14px;color:var(--muted)">Supabase: texzgslhswsyooixscmz</small>
 </div></div>
 
 <aside id="sidebar" class="hidden">
@@ -72,7 +72,6 @@ input,select,textarea{padding:10px 12px;border-radius:12px;border:1.5px solid va
 <main id="main" class="hidden">
 <div class="topbar"><h1 id="tabTitle" style="margin:0">Dashboard</h1><div style="display:flex;gap:8px"><span id="liveDot" style="background:#1a9c5a;color:#fff;padding:6px 12px;border-radius:999px;font-size:12px;font-weight:700">● LIVE</span><button class="btn-ghost btn" id="refresh">Refresh</button></div></div>
 
-<!-- DASH -->
 <section id="tab-dash">
 <div class="kpis" id="kpis"></div>
 <div class="grid2">
@@ -85,25 +84,17 @@ input,select,textarea{padding:10px 12px;border-radius:12px;border:1.5px solid va
 </div>
 </section>
 
-<!-- ORDERS -->
 <section id="tab-orders" class="hidden">
 <div class="card"><div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px"><input id="searchOrder" placeholder="Search customer / phone"/><select id="statusFilter"><option value="all">All status</option><option value="new">New</option><option value="preparing">Preparing</option><option value="ready">Ready</option><option value="completed">Completed</option><option value="cancelled">Cancelled</option></select><select id="sortOrder"><option value="newest">Newest first</option><option value="total">Highest total</option></select></div><div style="overflow:auto"><table class="table"><thead><tr><th>Time</th><th>Customer</th><th>Items</th><th>Total</th><th>Status</th><th>Action</th></tr></thead><tbody id="ordersBody"></tbody></table></div></div>
 </section>
 
-<!-- MENU -->
 <section id="tab-menu" class="hidden">
-<div class="grid2"><div class="card"><h3>Add / Edit product</h3><input id="pName" placeholder="Name (e.g., Red Velvet)"/><input id="pCat" placeholder="Category (Cakes, Bites, etc)"/><div style="display:grid;grid-template-columns:1fr 1fr;gap:8px"><input id="pPrice" type="number" placeholder="Price R"/><input id="pCost" type="number" placeholder="Cost R (profit calc)"/><input id="pStock" type="number" placeholder="Stock qty"/></div><input id="pImage" placeholder="Image URL"/><textarea id="pDesc" placeholder="Description" style="width:100%;height:70px;margin-top:8px"></textarea><label style="display:flex;gap:8px;align-items:center;margin:10px 0"><input type="checkbox" id="pAvail" checked/> Available</label><button class="btn" id="saveProduct">Save product</button><div id="prodMsg" style="margin-top:8px"></div></div><div class="card"><h3>Menu</h3><div id="productsList"></div></div></div>
+<div class="grid2"><div class="card"><h3>Add / Edit product</h3><input id="pName" placeholder="Name"/><input id="pCat" placeholder="Category"/><div style="display:grid;grid-template-columns:1fr 1fr;gap:8px"><input id="pPrice" type="number" placeholder="Price R"/><input id="pCost" type="number" placeholder="Cost R"/><input id="pStock" type="number" placeholder="Stock qty"/></div><input id="pImage" placeholder="Image URL"/><textarea id="pDesc" placeholder="Description" style="width:100%;height:70px;margin-top:8px"></textarea><label style="display:flex;gap:8px;align-items:center;margin:10px 0"><input type="checkbox" id="pAvail" checked/> Available</label><button class="btn" id="saveProduct">Save product</button><div id="prodMsg" style="margin-top:8px"></div></div><div class="card"><h3>Menu</h3><div id="productsList"></div></div></div>
 </section>
 
-<!-- CUSTOMERS -->
-<section id="tab-customers" class="hidden"><div class="card"><h3>Customers</h3><table class="table"><thead><tr><th>Name</th><th>Phone</th><th>Orders</th><th>Spent</th><th>Last</th><th>WhatsApp</th></tr></thead><tbody id="customersBody"></tbody></table></div></section>
-
-<!-- MARKETING -->
-<section id="tab-marketing" class="hidden"><div class="grid2"><div class="card"><h3>Create promo code</h3><input id="promoCode" placeholder="e.g., MAGGIE10"/><input id="promoPct" type="number" placeholder="Discount %"/><button class="btn" id="savePromo">Create code</button><div id="promoList" style="margin-top:12px"></div></div><div class="card"><h3>What to send</h3><p style="color:var(--muted)">Best promo text for WhatsApp Status: <br/><br/><b id="promoText">🔥 MAGGIE'S TREAT: Use code MAGGIE10 for 10% OFF today only! Order: erealstoterr.github.io</b></p></div></div></section>
-
-<!-- SETTINGS -->
-<section id="tab-settings" class="hidden"><div class="card"><h3>Store control</h3><label style="display:flex;gap:10px;align-items:center;margin:12px 0"><input type="checkbox" id="storeOpen" checked/> Store is OPEN for orders</label><div style="display:grid;grid-template-columns:1fr 1fr;gap:10px"><input id="deliveryFee" type="number" placeholder="Delivery fee R"/><input id="minOrder" type="number" placeholder="Min order R"/></div><textarea id="announcement" placeholder="Announcement banner (e.g., Closed on Sundays)" style="width:100%;height:80px;margin-top:10px"></textarea><button class="btn" id="saveSettings">Save settings</button><div id="settingsMsg" style="margin-top:10px"></div></div></section>
-
+<section id="tab-customers" class="hidden"><div class="card"><h3>Customers — Top Spenders</h3><table class="table"><thead><tr><th>Name</th><th>Phone</th><th>Orders</th><th>Spent</th><th>Last</th><th>WhatsApp</th></tr></thead><tbody id="customersBody"></tbody></table></div></section>
+<section id="tab-marketing" class="hidden"><div class="grid2"><div class="card"><h3>Create promo code</h3><input id="promoCode" placeholder="e.g., MAGGIE10"/><input id="promoPct" type="number" placeholder="Discount %"/><button class="btn" id="savePromo">Create code</button><div id="promoList" style="margin-top:12px"></div></div><div class="card"><h3>Promo text</h3><p style="color:var(--muted)">Copy for Status:<br/><br/><b id="promoText">🔥 MAGGIE'S TREAT: Use code MAGGIE10 for 10% OFF! Order: erealstoterr.github.io</b></p></div></div></section>
+<section id="tab-settings" class="hidden"><div class="card"><h3>Store control</h3><label style="display:flex;gap:10px;align-items:center;margin:12px 0"><input type="checkbox" id="storeOpen" checked/> Store is OPEN</label><div style="display:grid;grid-template-columns:1fr 1fr;gap:10px"><input id="deliveryFee" type="number" placeholder="Delivery fee R"/><input id="minOrder" type="number" placeholder="Min order R"/></div><textarea id="announcement" placeholder="Announcement banner" style="width:100%;height:80px;margin-top:10px"></textarea><button class="btn" id="saveSettings">Save settings</button><div id="settingsMsg" style="margin-top:10px"></div></div></section>
 </main>
 
 <script>
@@ -144,46 +135,54 @@ async function loadAll(){
     db.from('store_settings').select('*').eq('id',1).maybeSingle()
   ]);
   orders=o.data||[]; products=p.data||[]; settings=s.data||{};
-  renderKPI(); renderOrders(); renderProducts(); renderCustomers(); renderSettings(); renderCharts();
+  renderKPI(); renderOrders(); renderProducts(); renderCustomers(); renderSettings(); renderCharts(); loadPromos();
 }
 function renderKPI(){
   const now=new Date(); const today=new Date(now.getFullYear(),now.getMonth(),now.getDate());
   const week=new Date(); week.setDate(now.getDate()-7);
   const month=new Date(now.getFullYear(),now.getMonth(),1);
-  let revToday=0, revWeek=0, revMonth=0, todayCount=0, aov=0;
+  let revToday=0, revWeek=0, revMonth=0, todayCount=0;
   orders.forEach(o=>{const d=new Date(o.created_at); const t=Number(o.total||0); if(d>=today){revToday+=t; todayCount++;} if(d>=week) revWeek+=t; if(d>=month) revMonth+=t;});
-  aov=todayCount?revToday/todayCount:0;
-  $('kpis').innerHTML=`
-  <div class="kpi"><small>Revenue Today</small><h2>R ${revToday.toFixed(2)}</h2><div class="trend">+ ${todayCount} orders</div></div>
-  <div class="kpi"><small>Revenue Week</small><h2>R ${revWeek.toFixed(2)}</h2></div>
-  <div class="kpi"><small>Revenue Month</small><h2>R ${revMonth.toFixed(2)}</h2></div>
-  <div class="kpi"><small>Avg Order Today</small><h2>R ${aov.toFixed(2)}</h2></div>`;
+  const aov=todayCount?revToday/todayCount:0;
+  $('kpis').innerHTML=`<div class="kpi"><small>Revenue Today</small><h2>R ${revToday.toFixed(2)}</h2><div style="font-size:12px;color:#1a9c5a">+ ${todayCount} orders</div></div><div class="kpi"><small>Week</small><h2>R ${revWeek.toFixed(2)}</h2></div><div class="kpi"><small>Month</small><h2>R ${revMonth.toFixed(2)}</h2></div><div class="kpi"><small>Avg Order</small><h2>R ${aov.toFixed(2)}</h2></div>`;
   const low=products.filter(p=>p.stock<10);
-  $('alerts').innerHTML=low.length?`<div style="background:#fff1e0;padding:10px;border-radius:12px;font-size:13px">⚠️ Low stock: ${low.map(l=>l.name).join(', ')}</div>`:`<div style="color:var(--muted);font-size:13px">✓ Stock levels OK</div>`;
+  $('alerts').innerHTML=low.length?`<div style="background:#fff1e0;padding:10px;border-radius:12px;font-size:13px">⚠️ Low stock: ${low.map(l=>l.name).join(', ')}</div>`:`<div style="color:var(--muted);font-size:13px">✓ Stock OK</div>`;
 }
 function renderCharts(){
   const days=[...Array(7)].map((_,i)=>{const d=new Date(); d.setDate(d.getDate()-6+i); return d;});
   const revByDay=days.map(d=>{const s=new Date(d.getFullYear(),d.getMonth(),d.getDate()); const e=new Date(s); e.setDate(s.getDate()+1); let sum=0; orders.forEach(o=>{const od=new Date(o.created_at); if(od>=s&&od<e) sum+=Number(o.total||0)}); return sum;});
   if(charts.rev) charts.rev.destroy();
-  charts.rev=new Chart($('revChart'),{type:'bar',data:{labels:days.map(d=>d.toLocaleDateString('en-ZA',{weekday:'short'})),datasets:[{label:'R',data:revByDay,backgroundColor:'#ff7900',borderRadius:8}]},options:{plugins:{legend:{display:false}},scales:{y:{beginAtZero:true}}}});
+  charts.rev=new Chart($('revChart'),{type:'bar',data:{labels:days.map(d=>d.toLocaleDateString('en-ZA',{weekday:'short'})),datasets:[{label:'R',data:revByDay,backgroundColor:'#ff7900'}]},options:{plugins:{legend:{display:false}}}});
   const hours=Array(24).fill(0); orders.forEach(o=>{const h=new Date(o.created_at).getHours(); hours[h]+=Number(o.total||0);});
   if(charts.hour) charts.hour.destroy();
-  charts.hour=new Chart($('hourChart'),{type:'line',data:{labels:hours.map((_,i)=>i+':00'),datasets:[{data:hours,borderColor:'#111',tension:.4,fill:false}]},options:{plugins:{legend:{display:false}}}});
+  charts.hour=new Chart($('hourChart'),{type:'line',data:{labels:hours.map((_,i)=>i+':00'),datasets:[{data:hours,borderColor:'#ff7900',tension:.4}]},options:{plugins:{legend:{display:false}}}});
   const top={}; orders.forEach(o=>{(o.item_details||[]).forEach(it=>{top[it.name]=(top[it.name]||0)+it.quantity;});});
   $('topProducts').innerHTML=Object.entries(top).sort((a,b)=>b[1]-a[1]).slice(0,5).map(([n,q])=>`<div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px dashed #eee"><span>${n}</span><b>${q} sold</b></div>`).join('')||'<small style="color:var(--muted)">No sales yet</small>';
 }
+
+// === ORDERS WITH DONE BUTTON ===
 function renderOrders(){
   const q=$('searchOrder').value.toLowerCase(); const f=$('statusFilter').value; const sort=$('sortOrder').value;
   let list=orders.filter(o=>{const okStatus=f==='all'||o.status===f; const okQ=!q||`${o.customer_name} ${o.phone}`.toLowerCase().includes(q); return okStatus&&okQ;});
   if(sort==='total') list=list.slice().sort((a,b)=>b.total-a.total);
   $('ordersBody').innerHTML=list.map(o=>{
     const items=(o.item_details||[]).map(i=>`${i.quantity}× ${i.name}`).join(', ');
-    const phone=(o.phone||'').replace(/\D/g,'');
-    return `<tr><td><small>${new Date(o.created_at).toLocaleString('en-ZA')}</small></td><td><b>${o.customer_name}</b><br/><small>${o.phone||''}</small></td><td style="max-width:220px"><small>${items}</small></td><td><b>R${Number(o.total).toFixed(2)}</b></td><td><span class="badge b-${o.status}">${o.status}</span></td><td><select onchange="updateStatus('${o.id}',this.value)" style="padding:6px"><option value="new" ${o.status==='new'?'selected':''}>New</option><option value="preparing" ${o.status==='preparing'?'selected':''}>Preparing</option><option value="ready" ${o.status==='ready'?'selected':''}>Ready</option><option value="completed" ${o.status==='completed'?'selected':''}>Completed</option><option value="cancelled" ${o.status==='cancelled'?'selected':''}>Cancelled</option></select> <a href="https://wa.me/${phone}?text=Hi ${encodeURIComponent(o.customer_name)}, your order from Maggie's Treat is ${o.status}! Total: R${o.total}" target="_blank" style="text-decoration:none">📱</a> <button onclick="printOrder('${o.id}')" style="border:0;background:#f5eee4;padding:6px 8px;border-radius:8px">🖨️</button></td></tr>`;
+    const isDone=o.status==='completed';
+    return `<tr><td><small>${new Date(o.created_at).toLocaleString('en-ZA')}</small></td><td><b>${o.customer_name}</b><br/><small>${o.phone||''}</small></td><td style="max-width:220px"><small>${items}</small></td><td><b>R${Number(o.total).toFixed(2)}</b></td><td><span class="badge b-${o.status}">${o.status}</span></td><td><div style="display:flex;gap:6px;flex-wrap:wrap">${isDone?`<span style="background:#e6f9ed;color:#0a7a2e;padding:6px 12px;border-radius:999px;font-weight:800;font-size:12px">✓ DONE</span>`:`<button class="btn-done" onclick="doneOrder('${o.id}')">DONE → WhatsApp</button>`}<select onchange="updateStatus('${o.id}',this.value)" style="padding:6px;border-radius:8px"><option value="new" ${o.status==='new'?'selected':''}>New</option><option value="preparing" ${o.status==='preparing'?'selected':''}>Preparing</option><option value="ready" ${o.status==='ready'?'selected':''}>Ready</option><option value="completed" ${o.status==='completed'?'selected':''}>Completed</option><option value="cancelled" ${o.status==='cancelled'?'selected':''}>Cancelled</option></select></div></td></tr>`;
   }).join('')||'<tr><td colspan=6 style="text-align:center;color:var(--muted)">No orders</td></tr>';
 }
 window.updateStatus=async(id,status)=>{await db.from('orders').update({status}).eq('id',id); loadAll();};
-window.printOrder=(id)=>{const o=orders.find(x=>x.id===id); if(!o) return; const w=window.open('','_blank'); w.document.write(`<pre>MAGGIE'S TREAT\n${new Date(o.created_at).toLocaleString()}\nCustomer: ${o.customer_name}\nPhone: ${o.phone}\n\n${(o.item_details||[]).map(i=>`${i.quantity} x ${i.name} - R${i.line_total}`).join('\n')}\n\nTOTAL: R${o.total}\nStatus: ${o.status}</pre>`); w.print();};
+window.doneOrder=async(id)=>{
+  const o=orders.find(x=>x.id===id); if(!o) return;
+  if(!confirm(`Mark ${o.customer_name}'s order as DONE and send WhatsApp?`)) return;
+  await db.from('orders').update({status:'completed'}).eq('id',id);
+  const itemsList=(o.item_details||[]).map(i=>`• ${i.quantity}x ${i.name}`).join('\n');
+  const message=`Hi ${o.customer_name}! 👋\n\nYour order from *Maggie's Treat* is DONE! 🎉\n\n${itemsList}\n\nTotal: R${Number(o.total).toFixed(2)}\n\nReady for collection / delivery! Thank you for your support 🧁\n\n- Maggie's Treat`;
+  let phone=(o.phone||'').replace(/\D/g,''); if(phone.startsWith('0')) phone='27'+phone.substring(1); if(phone.length===9) phone='27'+phone;
+  const waUrl=`https://wa.me/${phone}?text=${encodeURIComponent(message)}`;
+  window.open(waUrl,'_blank');
+  loadAll();
+};
 $('searchOrder').oninput=renderOrders; $('statusFilter').onchange=renderOrders; $('sortOrder').onchange=renderOrders;
 
 function renderProducts(){
@@ -196,24 +195,20 @@ $('saveProduct').onclick=async()=>{
   let res; if(editingId) res=await db.from('products').update(payload).eq('id',editingId); else res=await db.from('products').insert(payload);
   if(res.error) $('prodMsg').textContent=res.error.message; else { $('prodMsg').textContent='Saved ✓'; ['pName','pCat','pPrice','pCost','pStock','pImage','pDesc'].forEach(id=>$(id).value=''); editingId=null; loadAll(); }
 };
-window.editProd=(id)=>{const p=products.find(x=>x.id===id); if(!p) return; $('pName').value=p.name; $('pCat').value=p.category; $('pPrice').value=p.price; $('pCost').value=p.cost; $('pStock').value=p.stock; $('pImage').value=p.image_url; $('pDesc').value=p.description; $('pAvail').checked=p.is_available; editingId=id; switchTab('menu'); window.scrollTo(0,0);};
-window.delProd=async(id)=>{if(!confirm('Delete?')) return; await db.from('products').delete().eq('id',id); loadAll();};
+window.editProd=(id)=>{const p=products.find(x=>x.id===id); if(!p) return; $('pName').value=p.name; $('pCat').value=p.category; $('pPrice').value=p.price; $('pCost').value=p.cost; $('pStock').value=p.stock; $('pImage').value=p.image_url||''; $('pDesc').value=p.description||''; $('pAvail').checked=p.is_available; editingId=id; switchTab('menu'); window.scrollTo(0,0);};
+window.delProd=async(id)=>{if(!confirm('Delete product?')) return; await db.from('products').delete().eq('id',id); loadAll();};
 
 function renderCustomers(){
   const map={}; orders.forEach(o=>{const k=o.phone||o.customer_name; if(!map[k]) map[k]={name:o.customer_name,phone:o.phone,orders:0,spent:0,last:0}; map[k].orders++; map[k].spent+=Number(o.total||0); map[k].last=Math.max(map[k].last,new Date(o.created_at).getTime());});
   const list=Object.values(map).sort((a,b)=>b.spent-a.spent);
-  $('customersBody').innerHTML=list.map(c=>`<tr><td><b>${c.name}</b></td><td>${c.phone||''}</td><td>${c.orders}</td><td><b>R${c.spent.toFixed(2)}</b></td><td><small>${new Date(c.last).toLocaleDateString()}</small></td><td><a href="https://wa.me/${(c.phone||'').replace(/\D/g,'')}" target="_blank">📱 WhatsApp</a></td></tr>`).join('')||'<tr><td colspan=6>No customers</td></tr>';
+  $('customersBody').innerHTML=list.map(c=>`<tr><td><b>${c.name}</b></td><td>${c.phone||''}</td><td>${c.orders}</td><td><b>R${c.spent.toFixed(2)}</b></td><td><small>${new Date(c.last).toLocaleDateString()}</small></td><td><a href="https://wa.me/${(c.phone||'').replace(/\D/g,'').replace(/^0/,'27')}" target="_blank">📱 WhatsApp</a></td></tr>`).join('')||'<tr><td colspan=6>No customers</td></tr>';
 }
 $('savePromo').onclick=async()=>{const code=$('promoCode').value.trim().toUpperCase(); const pct=Number($('promoPct').value); if(!code||!pct) return; const {error}=await db.from('promos').insert({code,discount_percent:pct}); if(error) alert(error.message); else {$('promoCode').value=''; $('promoPct').value=''; loadPromos();}};
-async function loadPromos(){const {data}=await db.from('promos').select('*').order('created_at',{ascending:false}); $('promoList').innerHTML=(data||[]).map(p=>`<div style="display:flex;justify-content:space-between;padding:8px;background:#fbf6ee;border-radius:10px;margin:6px 0"><span><b>${p.code}</b> - ${p.discount_percent}%</span><small>${p.active?'Active':'Off'}</small></div>`).join('');}
-loadPromos();
-
+async function loadPromos(){const {data}=await db.from('promos').select('*').order('created_at',{ascending:false}); $('promoList').innerHTML=(data||[]).map(p=>`<div style="display:flex;justify-content:space-between;padding:8px;background:#fbf6ee;border-radius:10px;margin:6px 0"><span><b>${p.code}</b> - ${p.discount_percent}%</span><small>Active</small></div>`).join('');}
 function renderSettings(){if(!settings) return; $('storeOpen').checked=settings.is_open??true; $('deliveryFee').value=settings.delivery_fee??0; $('minOrder').value=settings.min_order??0; $('announcement').value=settings.announcement||'';}
-$('saveSettings').onclick=async()=>{const payload={id:1,is_open:$('storeOpen').checked,delivery_fee:Number($('deliveryFee').value),min_order:Number($('minOrder').value),announcement:$('announcement').value}; const {error}=await db.from('store_settings').upsert(payload); $('settingsMsg').textContent=error?error.message:'Saved ✓ — your site will read this setting';};
-
+$('saveSettings').onclick=async()=>{const payload={id:1,is_open:$('storeOpen').checked,delivery_fee:Number($('deliveryFee').value),min_order:Number($('minOrder').value),announcement:$('announcement').value}; const {error}=await db.from('store_settings').upsert(payload); $('settingsMsg').textContent=error?error.message:'Saved ✓';};
 $('exportBtn').onclick=()=>{const csv=['Date,Customer,Phone,Items,Total,Status',...orders.map(o=>`"${new Date(o.created_at).toLocaleString()}", "${o.customer_name}", "${o.phone||''}", "${(o.item_details||[]).map(i=>`${i.quantity}x ${i.name}`).join('; ')}", ${o.total}, ${o.status}`)].join('\n'); const blob=new Blob([csv],{type:'text/csv'}); const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download=`maggies-orders-${new Date().toISOString().slice(0,10)}.csv`; a.click();};
-
 (async()=>{const {data:{session}}=await db.auth.getSession(); if(session) boot(); else {$('loginWrap').classList.remove('hidden');}})();
 </script>
 </body>
-  </html>
+</html>
