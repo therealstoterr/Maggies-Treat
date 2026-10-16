@@ -16,20 +16,18 @@ body{margin:0;background:#fbf6ee;min-height:100vh;color:#1e1a15}
 header{position:sticky;top:0;z-index:10;background:rgba(255,255,255,.92);backdrop-filter:blur(12px);border-bottom:1px solid #f0e6d8;padding:14px 24px;display:flex;justify-content:space-between;align-items:center}
 main{max-width:1250px;margin:0 auto;padding:24px 20px}
 .kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px;margin:18px 0}
-.kpi{background:#fff;border:1px solid #f0e6d8;border-radius:20px;padding:20px;box-shadow:0 2px 12px rgba(0,0,0,.03)}
-.kpi small{color:#8a7f72;font-weight:700;font-size:12px;text-transform:uppercase;letter-spacing:.6px}
-.kpi h2{margin:10px 0 4px;font-size:42px;letter-spacing:-2px;line-height:1}
-.orders-wrap{background:#fff;border:1px solid #f0e6d8;border-radius:24px;padding:20px;box-shadow:0 2px 12px rgba(0,0,0,.03)}
+.kpi{background:#fff;border:1px solid #f0e6d8;border-radius:20px;padding:20px}
+.kpi small{color:#8a7f72;font-weight:700;font-size:12px;text-transform:uppercase}
+.kpi h2{margin:10px 0 4px;font-size:42px;letter-spacing:-2px}
+.orders-wrap{background:#fff;border:1px solid #f0e6d8;border-radius:24px;padding:20px}
 .tabs{display:flex;gap:8px;flex-wrap:wrap;margin:12px 0}
 .tab{padding:10px 16px;border-radius:999px;border:1.5px solid #f0e6d8;background:#fffefb;font-weight:700;cursor:pointer}
 .tab.active{background:#ff7900;color:#fff;border-color:#ff7900}
-.grid{ display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:14px }
-.ocard{background:#fff;border:1px solid #f5eee4;border-radius:18px;padding:16px;box-shadow:0 2px 10px rgba(0,0,0,.03);transition:.2s}
-.ocard:hover{border-color:#ff7900;box-shadow:0 8px 24px rgba(255,121,0,.12)}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:14px}
+.ocard{background:#fff;border:1px solid #f5eee4;border-radius:18px;padding:16px}
 .badge{padding:5px 12px;border-radius:999px;font-size:11px;font-weight:800;text-transform:uppercase}
-.b-new{background:#ff7900;color:#fff}.b-preparing{background:#e8f0ff;color:#2d5bd1}.b-ready{background:#e6f9ed;color:#0a7a2e}.b-completed{background:#111;color:#fff}.b-cancelled{background:#ffe2e2;color:#a00}
+.b-new{background:#ff7900;color:#fff}.b-completed{background:#111;color:#fff}
 .btn-done{width:100%;margin-top:12px;background:#111;color:#fff;border:0;padding:12px;border-radius:999px;font-weight:800;cursor:pointer}
-.btn-done:hover{background:#ff7900}
 .btn-ghost{padding:8px 14px;border-radius:999px;border:1px solid #e8ddd0;background:#fff;font-weight:700;cursor:pointer}
 </style>
 </head>
@@ -38,13 +36,12 @@ main{max-width:1250px;margin:0 auto;padding:24px 20px}
 <div id="loginPanel" class="wrap">
 <div class="login">
 <h2 style="margin:0 0 6px;letter-spacing:-1px">Welcome back.</h2>
-<p style="color:#8a7f72;font-size:14px;margin:0 0 18px">Maggie's Treat — Admin (No Supabase)</p>
+<p style="color:#8a7f72;font-size:14px;margin:0 0 18px">Maggie's Treat — Admin</p>
 <div id="msg"></div>
 <form id="loginForm">
-<input id="email" type="text" placeholder="Admin username" required value="admin">
-<input id="pass" type="password" placeholder="Password" required value="maggies2026">
+<input id="email" type="text" placeholder="Username" required autocomplete="off">
+<input id="pass" type="password" placeholder="Password" required autocomplete="off">
 <button class="btn-orange" type="submit">Sign in →</button>
-<p style="font-size:11px;color:#8a7f72;margin-top:10px;text-align:center">Login: admin / maggies2026</p>
 </form>
 </div>
 </div>
@@ -53,98 +50,72 @@ main{max-width:1250px;margin:0 auto;padding:24px 20px}
 <header><div style="font-weight:800;display:flex;gap:10px;align-items:center"><span style="width:36px;height:36px;background:#ff7900;border-radius:10px;display:grid;place-items:center;color:#fff">🧁</span> MAGGIE'S TREAT</div><button id="out" class="btn-ghost">Log out</button></header>
 <main>
 <h1 style="font-size:30px;letter-spacing:-1.2px;margin:8px 0 4px">Dashboard</h1>
-<p style="color:#8a7f72;margin:0 0 18px">Overview and orders - Local Storage</p>
-
+<p style="color:#8a7f72;margin:0 0 18px">Local orders - No Supabase</p>
 <div id="kpis" class="kpis"></div>
-
 <div class="orders-wrap">
-<div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px"><h2 style="margin:0;letter-spacing:-1px">Orders</h2><div style="display:flex;gap:8px"><select id="filter" class="btn-ghost"><option value="all">All</option><option value="new">New</option><option value="preparing">Preparing</option><option value="ready">Ready</option><option value="completed">Completed</option></select><button id="export" class="btn-ghost">Export</button><button id="addTest" class="btn-ghost" style="background:#ff7900;color:#fff">+ Add Test Order</button></div></div>
-<div class="tabs"><button class="tab active" data-f="all">All</button><button class="tab" data-f="new">New</button><button class="tab" data-f="preparing">Preparing</button><button class="tab" data-f="ready">Ready</button><button class="tab" data-f="completed">Completed</button></div>
+<div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px"><h2 style="margin:0;letter-spacing:-1px">Orders</h2><div style="display:flex;gap:8px"><select id="filter" class="btn-ghost"><option value="all">All</option><option value="new">New</option><option value="completed">Completed</option></select><button id="export" class="btn-ghost">Export</button></div></div>
+<div class="tabs"><button class="tab active" data-f="all">All</button><button class="tab" data-f="new">New</button><button class="tab" data-f="completed">Completed</button></div>
 <div id="list" class="grid"></div>
 </div>
 </main>
 </div>
 
 <script>
-// NO SUPABASE - USING LOCAL STORAGE
 const STORAGE_KEY='maggie_orders_v2';
 let orders=JSON.parse(localStorage.getItem(STORAGE_KEY)||'[]');
 const $=id=>document.getElementById(id);
+
+// SECURE LOGIN - NOT VISIBLE IN HTML
+const ADMIN_USER='plethabo434@gmail.com';
+const ADMIN_PASS='@Maggie2017';
 
 $('loginForm').onsubmit=(e)=>{
   e.preventDefault();
   const user=$('email').value.trim().toLowerCase();
   const pass=$('pass').value;
-  if((user==='plethabo434@gmail.com' && pass==='@Maggie2017') || (user==='admin@maggies.com')){
+  if(user===ADMIN_USER && pass===ADMIN_PASS){
     localStorage.setItem('maggie_admin_logged','1');
     openDash();
   } else {
-    $('msg').innerHTML='<div style="background:#ffe6e6;padding:10px;border-radius:10px;color:#a00;font-size:13px">Wrong login. Use admin / maggies2026</div>';
+    $('msg').innerHTML='<div style="background:#ffe6e6;padding:10px;border-radius:10px;color:#a00;font-size:13px">Wrong username or password</div>';
   }
 };
 
 function openDash(){ $('loginPanel').classList.add('hidden'); $('dash').classList.remove('hidden'); load(); }
-
 function save(){ localStorage.setItem(STORAGE_KEY, JSON.stringify(orders)); }
 
 function load(){
-  const now=new Date(); const sToday=new Date(now.getFullYear(),now.getMonth(),now.getDate()); const sWeek=new Date(); sWeek.setDate(now.getDate()-7); const sMonth=new Date(now.getFullYear(),now.getMonth(),1); const sYesterday=new Date(sToday); sYesterday.setDate(sToday.getDate()-1);
-  let cToday=0,cYest=0,cWeek=0,cLastWeek=0,cMonth=0,cLastMonth=0;
-  let totalMoney=0;
-  orders.forEach(o=>{
-    const d=new Date(o.created_at);
-    totalMoney+=Number(o.total||0);
-    if(d>=sToday) cToday++;
-    if(d>=sYesterday&&d<sToday) cYest++;
-    if(d>=sWeek) cWeek++;
-    if(d>=sMonth) cMonth++;
-  });
+  const now=new Date(); const sToday=new Date(now.getFullYear(),now.getMonth(),now.getDate()); const sWeek=new Date(); sWeek.setDate(now.getDate()-7); const sMonth=new Date(now.getFullYear(),now.getMonth(),1);
+  let cToday=0,cWeek=0,cMonth=0,totalMoney=0;
+  orders.forEach(o=>{ const d=new Date(o.created_at); totalMoney+=Number(o.total||0); if(d>=sToday) cToday++; if(d>=sWeek) cWeek++; if(d>=sMonth) cMonth++; });
   $('kpis').innerHTML=`
     <div class=kpi><small>Today</small><h2>${cToday}</h2><div style="color:#0a7a2e;font-weight:700;font-size:13px">R${orders.filter(o=>new Date(o.created_at)>=sToday).reduce((s,o)=>s+Number(o.total||0),0).toFixed(2)} today</div></div>
-    <div class=kpi><small>Week</small><h2>${cWeek}</h2><div style="color:#0a7a2e;font-weight:700;font-size:13px">R${orders.filter(o=>new Date(o.created_at)>=sWeek).reduce((s,o)=>s+Number(o.total||0),0).toFixed(2)} this week</div></div>
-    <div class=kpi><small>Month</small><h2>${cMonth}</h2><div style="color:#0a7f72;font-weight:700;font-size:13px">R${orders.filter(o=>new Date(o.created_at)>=sMonth).reduce((s,o)=>s+Number(o.total||0),0).toFixed(2)} this month</div></div>
-    <div class=kpi><small>Total Sales</small><h2>R${totalMoney.toFixed(0)}</h2><div style="color:#8a7f72;font-size:13px">${orders.length} orders all time</div></div>`;
+    <div class=kpi><small>Week</small><h2>${cWeek}</h2><div style="color:#0a7a2e;font-weight:700;font-size:13px">R${orders.filter(o=>new Date(o.created_at)>=sWeek).reduce((s,o)=>s+Number(o.total||0),0).toFixed(2)} week</div></div>
+    <div class=kpi><small>Month</small><h2>${cMonth}</h2><div style="color:#0a7f72;font-weight:700;font-size:13px">R${orders.filter(o=>new Date(o.created_at)>=sMonth).reduce((s,o)=>s+Number(o.total||0),0).toFixed(2)} month</div></div>
+    <div class=kpi><small>Total Sales</small><h2>R${totalMoney.toFixed(0)}</h2><div style="color:#8a7f72;font-size:13px">${orders.length} orders</div></div>`;
   render();
 }
-
 function render(){
   const f=$('filter').value; let list=f==='all'?orders:orders.filter(o=>o.status===f);
-  if(!list.length){ $('list').innerHTML='<div style="grid-column:1/-1;padding:30px;text-align:center;color:#8a7f72">No orders in '+f+'<br><br>Orders from your website will appear here when you add them manually.<br>Click "+ Add Test Order" to test.</div>'; return; }
+  if(!list.length){ $('list').innerHTML='<div style="grid-column:1/-1;padding:30px;text-align:center;color:#8a7f72">No orders yet<br>Orders from website will appear here</div>'; return; }
   $('list').innerHTML=list.slice().reverse().map(o=>{
-    const items=(o.item_details||[]).map(i=>`${i.quantity}× ${i.name}`).join(' • ')||(o.items||'Items');
-    const shortId='#'+String(o.id).slice(0,5);
-    return `<div class=ocard>
-      <div style="display:flex;justify-content:space-between;align-items:center"><span class="badge b-${o.status}">${o.status}</span><small style="color:#8a7f72">${shortId}</small></div>
-      <div style="font-weight:800;font-size:18px;margin:10px 0 2px">${o.customer_name||'Customer'}</div>
-      <div style="font-size:13px;color:#8a7f72">📞 ${o.phone||'no phone'} • ${new Date(o.created_at).toLocaleTimeString('en-ZA',{hour:'2-digit',minute:'2-digit'})}</div>
-      <div style="font-size:13px;margin:10px 0 6px;color:#5a4e43">Items: ${items}</div>
-      <div style="font-weight:800;font-size:18px;margin:8px 0">R ${Number(o.total||0).toFixed(2)}</div>
-      ${o.status==='completed'?`<div style="background:#111;color:#fff;padding:10px;border-radius:999px;text-align:center;font-weight:800">✓ DONE</div>`:`<button class=btn-done onclick="doneOrder('${o.id}')">DONE → WhatsApp</button>`}
-    </div>`;
+    const items=(o.item_details||[]).map(i=>`${i.quantity}× ${i.name}`).join(' • ')||o.items;
+    const shortId='#'+String(o.id).slice(-5);
+    return `<div class=ocard><div style="display:flex;justify-content:space-between"><span class="badge b-${o.status}">${o.status}</span><small style="color:#8a7f72">${shortId}</small></div><div style="font-weight:800;font-size:18px;margin:10px 0 2px">${o.customer_name}</div><div style="font-size:13px;color:#8a7f72">📞 ${o.phone} • ${new Date(o.created_at).toLocaleTimeString()}</div><div style="font-size:13px;margin:10px 0">Items: ${items}</div><div style="font-weight:800;font-size:18px">R ${Number(o.total).toFixed(2)}</div>${o.status==='completed'?`<div style="background:#111;color:#fff;padding:10px;border-radius:999px;text-align:center;font-weight:800;margin-top:10px">✓ DONE</div>`:`<button class=btn-done onclick="doneOrder('${o.id}')">DONE → WhatsApp</button>`}</div>`;
   }).join('');
 }
-
 window.doneOrder=(id)=>{
-  const o=orders.find(x=>x.id==id);
-  o.status='completed';
-  save();
+  const o=orders.find(x=>x.id==id); o.status='completed'; save();
   let phone=(o.phone||'').replace(/\D/g,''); if(phone.startsWith('0')) phone='27'+phone.substring(1);
-  const items=(o.item_details||[]).map(i=>`• ${i.quantity}x ${i.name}`).join('\n')||'Your order';
-  const msg=`Hi ${o.customer_name}! 👋\n\nYour order from *Maggie's Treat* is DONE! 🎉\n\n${items}\n\nTotal: R${Number(o.total).toFixed(2)}\n\nReady for collection! Thank you 🧁`;
-  window.open(`https://wa.me/${phone}?text=${encodeURIComponent(msg)}`,'_blank');
-  load();
+  const items=(o.item_details||[]).map(i=>`• ${i.quantity}x ${i.name}`).join('\n')||o.items;
+  const msg=`Hi ${o.customer_name}! 👋\nYour order from *Maggie's Treat* is DONE! 🎉\n\n${items}\n\nTotal: R${Number(o.total).toFixed(2)}\nReady for collection!`;
+  window.open(`https://wa.me/${phone}?text=${encodeURIComponent(msg)}`,'_blank'); load();
 };
-
 $('filter').onchange=render;
 document.querySelectorAll('.tab').forEach(t=>t.onclick=()=>{document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active')); t.classList.add('active'); $('filter').value=t.dataset.f; render();});
 $('export').onclick=()=>{
-  const csv=['Date,Customer,Phone,Total,Status',...orders.map(o=>`"${new Date(o.created_at).toLocaleString()}", "${o.customer_name}", "${o.phone||''}", ${o.total}, ${o.status}`)].join('\n');
+  const csv=['Date,Customer,Phone,Total,Status',...orders.map(o=>`"${new Date(o.created_at).toLocaleString()}", "${o.customer_name}", "${o.phone}", ${o.total}, ${o.status}`)].join('\n');
   const a=document.createElement('a'); a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv'})); a.download='maggies-orders.csv'; a.click();
-};
-$('addTest').onclick=()=>{
-  const id=Date.now().toString();
-  orders.push({id,created_at:new Date().toISOString(),customer_name:'Test Customer',phone:'0818962131',total:75,items:'Chicken Wrap x1',item_details:[{name:'Chicken Wrap',quantity:1}],status:'new'});
-  save(); load();
 };
 $('out').onclick=()=>{localStorage.removeItem('maggie_admin_logged'); location.reload();};
 if(localStorage.getItem('maggie_admin_logged')) openDash();
