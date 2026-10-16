@@ -2,126 +2,92 @@
 <html lang="en-ZA">
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Admin | Maggie's Treat</title>
-<link rel="stylesheet" href="styles.css">
+<title>Maggie's Treat - Dashboard</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.7/dist/umd/supabase.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
 <style>
-body{display:block!important;background:#f7f1e8;min-height:100vh}
+body{margin:0;background:#f7f1e8;font-family:sans-serif}
 .hidden{display:none!important}
-.login-panel{max-width:480px;margin:40px auto;background:#fff;padding:32px;border-radius:24px;box-shadow:0 8px 30px rgba(0,0,0,.08)}
-.login-panel input{width:100%;padding:14px;border-radius:12px;border:1px solid #ddd;margin:8px 0 16px}
-.button{width:100%;padding:14px;border-radius:999px;background:#ff7900;color:#fff;border:0;font-weight:700;cursor:pointer}
-.error{color:#b00;background:#ffe6e6;padding:12px;border-radius:8px;margin:10px 0}
-.order-card,.stat-card,.card{background:#fff;padding:16px;margin:10px 0;border-radius:16px;box-shadow:0 2px 10px rgba(0,0,0,.05)}
-.order-items{list-style:none;padding:0}
-.order-items li{display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px dashed #eee}
-.tabs{display:flex;gap:8px;flex-wrap:wrap;margin:16px 0}
-.tab{padding:10px 16px;border-radius:999px;border:1.5px solid #e6d8c3;background:#fff;cursor:pointer;font-weight:700}
-.tab.active{background:#111;color:#fff;border-color:#111}
+.card,.stat-card,.order-card{background:#fff;padding:16px;margin:10px 0;border-radius:16px;box-shadow:0 2px 10px rgba(0,0,0,.05)}
 .btn-done{background:#111;color:#fff;border:0;padding:10px 16px;border-radius:999px;font-weight:800;cursor:pointer}
 .badge{padding:4px 10px;border-radius:999px;font-size:11px;font-weight:800;text-transform:uppercase}
 .b-new{background:#fff1e0;color:#b65d00}.b-preparing{background:#e8f0ff;color:#2d5bd1}.b-ready,.b-completed{background:#e6f9ed;color:#0a7a2e}.b-cancelled{background:#ffe2e2;color:#a00}
-.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px}
+.tabs{display:flex;gap:8px;flex-wrap:wrap;margin:16px 0}
+.tab{padding:10px 16px;border-radius:999px;border:1.5px solid #e6d8c3;background:#fff;cursor:pointer;font-weight:700}
+.tab.active{background:#111;color:#fff}
+.order-items{list-style:none;padding:0}
+.order-items li{display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px dashed #eee}
 </style>
 </head>
 <body>
-<header style="padding:16px;display:flex;justify-content:space-between;background:#fff"><a href="index.html"><strong>MAGGIE'S TREAT</strong></a><div><span id="liveDot" class="hidden" style="background:#1a9c5a;color:#fff;padding:6px 12px;border-radius:999px;font-size:12px;font-weight:700;margin-right:8px">● LIVE</span><button id="logoutBtn" class="hidden" style="padding:8px 16px;border-radius:999px;border:1px solid #ddd;background:#fff">Log out</button></div></header>
+<header style="padding:16px;background:#fff;display:flex;justify-content:space-between"><strong>MAGGIE'S TREAT</strong><div><span id="liveDot" style="background:#1a9c5a;color:#fff;padding:6px 12px;border-radius:999px;font-size:12px">● LIVE</span> <button id="logoutBtn" style="padding:8px 16px;border-radius:999px;border:1px solid #ddd;background:#fff">Log out</button></div></header>
 <main style="padding:20px;max-width:1200px;margin:0 auto">
-
-<!-- ONLY ONE LOGIN - YOUR GOOD ONE -->
-<div id="loginPanel" class="login-panel">
-<h2>Welcome back.</h2>
-<div id="loginMessage"></div>
-<form id="loginForm">
-<label>Admin email</label><input id="loginEmail" type="email" value="plethabo434@gmail.com" required>
-<label>Password</label><input id="loginPassword" type="password" required>
-<button class="button" type="submit">Sign in to dashboard →</button>
-</form>
-</div>
-
-<div id="dashboardPanel" class="hidden">
-<div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;margin-bottom:10px"><h1>Store dashboard</h1><button id="refreshBtn" style="padding:10px 18px;border-radius:999px;border:0;background:#111;color:#fff">Refresh</button></div>
+<h1>Store dashboard</h1>
+<div id="stats" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px"></div>
+<div class="card"><canvas id="revChart" height="100"></canvas></div>
 
 <div class="tabs">
-<button class="tab active" data-tab="overview">Overview</button>
-<button class="tab" data-tab="orders">Orders</button>
-<button class="tab" data-tab="settings">Settings</button>
+<button class="tab active" data-tab="orders">Orders (DONE → WhatsApp)</button>
+<button class="tab" data-tab="export">Export</button>
 </div>
 
-<div id="tab-overview"><div id="stats" class="kpis"></div><div class="card"><h3>Revenue Last 7 Days</h3><canvas id="revChart" height="100"></canvas></div></div>
-
-<div id="tab-orders" class="hidden"><div class="card"><div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px"><select id="filter" style="padding:8px 12px;border-radius:999px"><option value="all">All</option><option value="new">New</option><option value="preparing">Preparing</option><option value="ready">Ready</option><option value="completed">Completed</option></select><button id="exportBtn" style="padding:8px 14px;border-radius:999px;border:1px solid #ddd;background:#fff;font-weight:700">Export CSV</button></div><div id="ordersList"></div></div></div>
-
-<div id="tab-settings" class="hidden"><div class="card"><h3>Store Control</h3><label><input type="checkbox" id="storeOpen" checked/> Store OPEN</label></div></div>
+<div id="tab-orders">
+<select id="filter" style="padding:8px 12px;border-radius:999px;margin:10px 0"><option value="all">All</option><option value="new">New</option><option value="preparing">Preparing</option><option value="ready">Ready</option><option value="completed">Completed</option></select>
+<div id="ordersList"></div>
 </div>
+
+<div id="tab-export" class="hidden"><div class="card"><button id="exportBtn" style="padding:10px 16px;border-radius:999px;border:1px solid #ddd;background:#fff;font-weight:700">📤 Export Orders CSV</button></div></div>
 </main>
 
 <script>
-const SUPABASE_URL='https://texzgslhswsyooixscmz.supabase.co';
-const SUPABASE_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRleHpnc2xoc3dzeW9vaXhzY216Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTIxMDE2NDEsImV4cCI6MjEwNzY3NzY0MX0.Ui612PvVsw3jpT_WnR3U4ve8zNpYfcdHSd7KfuKv9U8';
-const db=supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
+const db=supabase.createClient('https://texzgslhswsyooixscmz.supabase.co','eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRleHpnc2xoc3dzeW9vaXhzY216Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTIxMDE2NDEsImV4cCI6MjEwNzY3NzY0MX0.Ui612PvVsw3jpT_WnR3U4ve8zNpYfcdHSd7KfuKv9U8');
 const $=id=>document.getElementById(id);
-let orders=[],chartRev=null;
+let orders=[],chart=null;
 
-$('loginForm').onsubmit=async(e)=>{
-  e.preventDefault();
-  $('loginMessage').textContent='Signing in…';
-  const email=$('loginEmail').value.trim().toLowerCase();
-  const password=$('loginPassword').value;
-  const {data,error}=await db.auth.signInWithPassword({email,password});
-  if(error){ $('loginMessage').innerHTML='<div class=error>'+error.message+'</div>'; return; }
-  openDash();
-};
-$('logoutBtn').onclick=async()=>{ await db.auth.signOut(); location.reload(); };
-$('refreshBtn').onclick=load;
-$('filter').onchange=render;
-
-async function openDash(){ $('loginPanel').classList.add('hidden'); $('dashboardPanel').classList.remove('hidden'); $('logoutBtn').classList.remove('hidden'); $('liveDot').classList.remove('hidden'); await load(); }
+async function init(){
+  const {data:{session}}=await db.auth.getSession();
+  if(!session){ document.body.innerHTML='<div style="padding:40px;text-align:center"><h2>Not logged in</h2><p>Go back to <a href="admin.html">admin.html</a> to login first</p></div>'; return; }
+  load();
+}
 
 async function load(){
-  $('ordersList').innerHTML='Loading…';
-  try{
-    const {data:ordersData,error:oErr}=await db.from('orders').select('*').order('created_at',{ascending:false}).limit(100);
-    if(oErr) throw oErr;
-    orders=ordersData;
-    let revToday=0, revWeek=0, revMonth=0, todayCount=0;
-    const now=new Date(); const startToday=new Date(now.getFullYear(),now.getMonth(),now.getDate());
-    const startWeek=new Date(now); startWeek.setDate(now.getDate()-7);
-    const startMonth=new Date(now.getFullYear(),now.getMonth(),1);
-    orders.forEach(o=>{ const d=new Date(o.created_at); const tot=Number(o.total||0); if(d>=startToday){revToday+=tot; todayCount++} if(d>=startWeek) revWeek+=tot; if(d>=startMonth) revMonth+=tot; });
-    $('stats').innerHTML=`<div class=stat-card><small>Today</small><h2>R ${revToday.toFixed(2)}</h2><small>${todayCount} orders</small></div><div class=stat-card><small>Week</small><h2>R ${revWeek.toFixed(2)}</h2></div><div class=stat-card><small>Month</small><h2>R ${revMonth.toFixed(2)}</h2></div><div class=stat-card><small>Avg Order</small><h2>R ${(todayCount?revToday/todayCount:0).toFixed(2)}</h2></div>`;
-    const days=[...Array(7)].map((_,i)=>{const d=new Date(); d.setDate(d.getDate()-6+i); return d;});
-    const revByDay=days.map(d=>{const s=new Date(d.getFullYear(),d.getMonth(),d.getDate()); const e=new Date(s); e.setDate(s.getDate()+1); let sum=0; orders.forEach(o=>{const od=new Date(o.created_at); if(od>=s&&od<e) sum+=Number(o.total||0)}); return sum;});
-    if(chartRev) chartRev.destroy();
-    chartRev=new Chart($('revChart'),{type:'bar',data:{labels:days.map(d=>d.toLocaleDateString('en-ZA',[STRIPPED]
-    render();
-  }catch(err){ $('ordersList').innerHTML='<div class=error>'+err.message+'</div>'; }
+  const {data,error}=await db.from('orders').select('*').order('created_at',{ascending:false}).limit(100);
+  if(error){ $('ordersList').innerHTML='<p style="color:red">'+error.message+'</p>'; return; }
+  orders=data;
+  let today=0,week=0,month=0,todayCount=0;
+  const now=new Date(); const sToday=new Date(now.getFullYear(),now.getMonth(),now.getDate()); const sWeek=new Date(); sWeek.setDate(now.getDate()-7); const sMonth=new Date(now.getFullYear(),now.getMonth(),1);
+  orders.forEach(o=>{const d=new Date(o.created_at); const t=Number(o.total||0); if(d>=sToday){today+=t; todayCount++;} if(d>=sWeek) week+=t; if(d>=sMonth) month+=t;});
+  $('stats').innerHTML=`<div class=stat-card><small>Today</small><h2>R ${today.toFixed(2)}</h2><small>${todayCount} orders</small></div><div class=stat-card><small>Week</small><h2>R ${week.toFixed(2)}</h2></div><div class=stat-card><small>Month</small><h2>R ${month.toFixed(2)}</h2></div>`;
+  const days=[...Array(7)].map((_,i)=>{const d=new Date(); d.setDate(d.getDate()-6+i); return d;});
+  const rev=days.map(d=>{const s=new Date(d.getFullYear(),d.getMonth(),d.getDate()); const e=new Date(s); e.setDate(s.getDate()+1); let sum=0; orders.forEach(o=>{const od=new Date(o.created_at); if(od>=s&&od<e) sum+=Number(o.total||0)}); return sum;});
+  if(chart) chart.destroy();
+  chart=new Chart($('revChart'),{type:'bar',data:{labels:days.map(d=>d.toLocaleDateString('en-ZA',[STRIPPED]
+  render();
 }
-
 function render(){
   const f=$('filter').value; let list=f==='all'?orders:orders.filter(o=>o.status===f);
-  if(!list.length){ $('ordersList').innerHTML='<p>No orders.</p>'; return; }
+  if(!list.length){ $('ordersList').innerHTML='<p>No orders</p>'; return; }
   $('ordersList').innerHTML=list.map(o=>{
-    const items=Array.isArray(o.item_details)?o.item_details.map(i=>`<li><span>${i.quantity}× ${i.name}</span><span>R${(i.line_total||i.price*i.quantity||0).toFixed(2)}</span></li>`).join(''):'';
-    const isDone=o.status==='completed';
-    return `<div class=order-card><div style="display:flex;justify-content:space-between"><b>${o.customer_name}</b><b>R${Number(o.total).toFixed(2)}</b></div><small>${new Date(o.created_at).toLocaleString('en-ZA')} • <span class="badge b-${o.status}">${o.status}</span></small><ul class=order-items>${items}</ul><small>📞 ${o.phone||''}</small><div style="margin-top:12px;display:flex;gap:8px;flex-wrap:wrap">${isDone?`<span style="background:#e6f9ed;color:#0a7a2e;padding:8px 14px;border-radius:999px;font-weight:800;font-size:13px">✓ DONE</span>`:`<button class="btn-done" onclick="doneOrder('${o.id}')">DONE → WhatsApp</button>`}<select onchange="updateStatus('${o.id}',this.value)" style="padding:8px 12px;border-radius:999px"><option value="new" ${o.status==='new'?'selected':''}>New</option><option value="preparing" ${o.status==='preparing'?'selected':''}>Preparing</option><option value="ready" ${o.status==='ready'?'selected':''}>Ready</option><option value="completed" ${o.status==='completed'?'selected':''}>Completed</option><option value="cancelled" ${o.status==='cancelled'?'selected':''}>Cancelled</option></select></div></div>`;
+    const items=Array.isArray(o.item_details)?o.item_details.map(i=>`<li><span>${i.quantity}× ${i.name}</span><span>R${(i.line_total||0).toFixed(2)}</span></li>`).join(''):'';
+    const done=o.status==='completed';
+    return `<div class=order-card><div style="display:flex;justify-content:space-between"><b>${o.customer_name}</b><b>R${Number(o.total).toFixed(2)}</b></div><small>${new Date(o.created_at).toLocaleString('en-ZA')} • <span class="badge b-${o.status}">${o.status}</span> • ${o.phone||''}</small><ul class=order-items>${items}</ul><div style="margin-top:12px;display:flex;gap:8px">${done?`<span style="background:#e6f9ed;color:#0a7a2e;padding:8px 14px;border-radius:999px;font-weight:800">✓ DONE</span>`:`<button class=btn-done onclick="doneOrder('${o.id}')">DONE → WhatsApp</button>`}<select onchange="updateStatus('${o.id}',this.value)" style="padding:8px 12px;border-radius:999px"><option value="new" ${o.status==='new'?'selected':''}>New</option><option value="preparing" ${o.status==='preparing'?'selected':''}>Preparing</option><option value="ready" ${o.status==='ready'?'selected':''}>Ready</option><option value="completed" ${o.status==='completed'?'selected':''}>Completed</option><option value="cancelled" ${o.status==='cancelled'?'selected':''}>Cancelled</option></select></div></div>`;
   }).join('');
 }
-window.updateStatus=async(id,status)=>{ await db.from('orders').update({status}).eq('id',id); load(); };
+window.updateStatus=async(id,s)=>{await db.from('orders').update({status:s}).eq('id',id); load();};
 window.doneOrder=async(id)=>{
   const o=orders.find(x=>x.id===id); if(!o) return;
-  if(!confirm(`Mark ${o.customer_name} as DONE and WhatsApp?`)) return;
   await db.from('orders').update({status:'completed'}).eq('id',id);
-  const itemsList=(o.item_details||[]).map(i=>`• ${i.quantity}x ${i.name}`).join('\n');
-  const message=`Hi ${o.customer_name}! 👋\n\nYour order from *Maggie's Treat* is DONE! 🎉\n\n${itemsList}\n\nTotal: R${Number(o.total).toFixed(2)}\n\nReady for collection / delivery! Thank you 🧁\n\n- Maggie's Treat`;
-  let phone=(o.phone||'').replace(/\D/g,''); if(phone.startsWith('0')) phone='27'+phone.substring(1); if(phone.length===9) phone='27'+phone;
-  window.open(`https://wa.me/${phone}?text=${encodeURIComponent(message)}`,'_blank');
+  const list=(o.item_details||[]).map(i=>`• ${i.quantity}x ${i.name}`).join('\n');
+  const msg=`Hi ${o.customer_name}! 👋\n\nYour order from *Maggie's Treat* is DONE! 🎉\n\n${list}\n\nTotal: R${Number(o.total).toFixed(2)}\n\nReady for collection / delivery! Thank you 🧁\n\n- Maggie's Treat`;
+  let phone=(o.phone||'').replace(/\D/g,''); if(phone.startsWith('0')) phone='27'+phone.substring(1);
+  window.open(`https://wa.me/${phone}?text=${encodeURIComponent(msg)}`,'_blank');
   load();
 };
-$('exportBtn').onclick=()=>{const csv=['Date,Customer,Phone,Total,Status',...orders.map(o=>`"${new Date(o.created_at).toLocaleString()}", "${o.customer_name}", "${o.phone||''}", ${o.total}, ${o.status}`)].join('\n'); const blob=new Blob([csv],{type:'text/csv'}); const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download=`orders-${new Date().toISOString().slice(0,10)}.csv`; a.click();};
+$('filter').onchange=render;
+$('logoutBtn').onclick=async()=>{await db.auth.signOut(); location.href='admin.html';};
+$('exportBtn').onclick=()=>{const csv=['Date,Customer,Phone,Total,Status',...orders.map(o=>`"${new Date(o.created_at).toLocaleString()}", "${o.customer_name}", "${o.phone||''}", ${o.total}, ${o.status}`)].join('\n'); const b=new Blob([csv],{type:'text/csv'}); const a=document.createElement('a'); a.href=URL.createObjectURL(b); a.download=`orders.csv`; a.click();};
 document.querySelectorAll('.tab').forEach(t=>t.onclick=()=>{document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active')); t.classList.add('active'); document.querySelectorAll('[id^=tab-]').forEach(s=>s.classList.add('hidden')); $('tab-'+t.dataset.tab).classList.remove('hidden');});
-(async()=>{ const {data:{session}}=await db.auth.getSession(); if(session) openDash(); })();
+init();
 </script>
 </body>
-</html>
+  </html>
