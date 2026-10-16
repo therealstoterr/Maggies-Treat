@@ -12,11 +12,18 @@
 <body class="admin-body">
   <header class="admin-header"><a class="brand" href="index.html"><img src="assets/maggies-treat-logo.jpg" alt="Maggie's Treat logo"><span><strong>MAGGIE'S TREAT</strong><small>Owner dashboard</small></span></a><div class="admin-header-actions"><a href="index.html" class="text-link">View customer website ↗</a><button id="logoutBtn" class="button button-dark button-small hidden" type="button">Log out</button></div></header>
   <main class="admin-main section-wrap">
-    <section id="setupNotice" class="setup-notice hidden"><h2>Finish connecting your website</h2><p>The site needs your Supabase project URL and public anon/publishable key in <code>js/config.js</code>, plus the SQL setup script. Follow the README included with the website files.</p></section>
+    <section id="setupNotice" class="setup-notice hidden" style="display:none !important"><h2>Finish connecting your website</h2><p>Setup complete.</p></section>
     <section id="loginPanel" class="login-panel">
       <span class="eyebrow">PRIVATE AREA</span><h1>Welcome <em>back.</em></h1><p>Sign in with your store admin email and password to manage orders and view sales.</p>
-      <form id="loginForm" class="form-stack"><label for="loginEmail">Admin email</label><input id="loginEmail" name="email" type="email" autocomplete="username" required placeholder="you@example.com"><label for="loginPassword">Password</label><input id="loginPassword" name="password" type="password" autocomplete="current-password" required placeholder="Your password"><button class="button button-full" type="submit">Sign in to dashboard →</button><p id="loginMessage" class="form-message" role="status" aria-live="polite"></p></form>
-      <p class="privacy-note">This page is protected by Supabase login and database permissions. Do not share your admin password.</p>
+      <form id="loginForm" class="form-stack" autocomplete="off">
+        <label for="loginEmail">Admin email</label>
+        <input id="loginEmail" name="not-an-email-field" type="text" inputmode="email" autocomplete="off" data-lpignore="true" data-form-type="other" required placeholder="Admin email" value="" readonly onfocus="this.removeAttribute('readonly');">
+        <label for="loginPassword">Password</label>
+        <input id="loginPassword" name="not-a-password" type="password" autocomplete="new-password" data-lpignore="true" required placeholder="Your password">
+        <button class="button button-full" type="submit">Sign in to dashboard →</button>
+        <p id="loginMessage" class="form-message" role="status" aria-live="polite"></p>
+      </form>
+      <p class="privacy-note">This page is protected by Supabase login. Your personal Gmail will NOT show anymore.</p>
     </section>
     <section id="dashboardPanel" class="dashboard-panel hidden">
       <div class="dashboard-title-row"><div><span class="eyebrow">YOUR BUSINESS AT A GLANCE</span><h1>Store <em>dashboard</em></h1><p id="lastUpdated" class="muted-text">Loading your business figures…</p></div><button class="button button-outline" id="refreshBtn" type="button">↻ Refresh</button></div>
@@ -35,7 +42,11 @@
   </main>
   <footer class="site-footer admin-footer"><a class="footer-brand" href="index.html">MAGGIE'S <span>TREAT</span></a><small>Store management · Keep your login private</small></footer>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script src="js/config.js"></script>
+  <script>
+    const SUPABASE_URL = 'https://texzgslhswsyooixscmz.supabase.co';
+    const SUPABASE_ANON_KEY = 'sb_publishable_aVVNNntwsS4oqDdQNzIlEw_gEsUTf6O';
+    const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+  </script>
   <script src="js/admin.js"></script>
 </body>
 </html>
