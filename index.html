@@ -93,9 +93,16 @@
             <input id="customerPhone" name="customerPhone" type="tel" autocomplete="tel" inputmode="tel" maxlength="25" placeholder="e.g. 081 234 5678" required>
             <label for="orderNote">Anything we should know? <small>(optional)</small></label>
             <textarea id="orderNote" name="orderNote" rows="3" maxlength="500" placeholder="Extra sauce, collection details, or special requests…"></textarea>
-            <button class="button button-full" type="submit" id="submitOrderBtn">Place my order → WhatsApp <span aria-hidden="true">→</span></button>
+            
+            <!-- TWO BUTTONS - WHATSAPP + ONLINE -->
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px">
+              <button type="button" id="whatsappOrderBtn" class="button" style="background:#25D366;color:#fff;border:0">💬 WhatsApp</button>
+              <button type="button" id="onlineOrderBtn" class="button button-dark" style="background:#111">🛒 Online Order</button>
+            </div>
+            <button type="submit" id="submitOrderBtn" style="display:none"></button>
+            
             <p class="form-message" id="orderMessage" role="status" aria-live="polite"></p>
-            <p class="privacy-note">Your order will open in WhatsApp for confirmation.</p>
+            <p class="privacy-note">Both buttons save to shop dashboard. WhatsApp also opens WhatsApp.</p>
           </form>
         </div>
       </div>
@@ -133,4 +140,4 @@
 
   <script src="js/app.js"></script>
 </body>
-                                                                                       </html>
+                                                                                                                     </html>
