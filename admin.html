@@ -41,16 +41,8 @@ main{max-width:1250px;margin:0 auto;padding:24px 20px}
 <form id="loginForm">
 <input id="email" type="text" placeholder="Username" required autocomplete="off">
 <input id="pass" type="password" placeholder="Password" required autocomplete="off">
-<!-- 2 SEPARATE BUTTONS -->
-<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:8px">
-  <button type="button" id="whatsappOrderBtn" style="display:flex;align-items:center;justify-content:center;gap:8px;background:#25D366;color:#fff;border:0;border-radius:999px;padding:16px 12px;font-weight:800;font-size:15px;cursor:pointer">
-    <span style="font-size:18px">💬</span> WhatsApp
-  </button>
-  <button type="button" id="onlineOrderBtn" style="display:flex;align-items:center;justify-content:center;gap:8px;background:#111;color:#fff;border:0;border-radius:999px;padding:16px 12px;font-weight:800;font-size:15px;cursor:pointer">
-    <span style="font-size:18px">🛒</span> Online Order
-  </button>
-</div>
-<button type="submit" id="submitOrderBtn" style="display:none"></button>
+<!-- FIXED: LOGIN ONLY -->
+<button type="submit" id="loginBtn" class="btn-orange" style="margin-top:8px">Login →</button>
 </form>
 </div>
 </div>
@@ -74,7 +66,6 @@ const STORAGE_KEY='maggie_orders_v2';
 let orders=JSON.parse(localStorage.getItem(STORAGE_KEY)||'[]');
 const $=id=>document.getElementById(id);
 
-// YOUR LOGIN - KEEPING SAME
 const ADMIN_USER='plethabo434@gmail.com';
 const ADMIN_PASS='@Maggie2017';
 
